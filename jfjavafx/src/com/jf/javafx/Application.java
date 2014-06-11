@@ -18,6 +18,7 @@ package com.jf.javafx;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Dictionary;
@@ -199,7 +200,7 @@ public class Application extends javafx.application.Application {
             final Application app = this;
             ResourceBundle rb;
             try {
-                rb = ResourceBundle.getBundle("controllers/" + path, Locale.getDefault(), new URLClassLoader(new URL[] {(new File(JF_RESOURCES)).toURL()}));
+                rb = getResourceBundle("controllers/" + path);
             } catch(Exception ex) {
                 Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
                 rb = null;
@@ -247,5 +248,15 @@ public class Application extends javafx.application.Application {
     
     public void showException(String title, Exception ex, String message) {
         Dialogs.create().title(title).message(message == null ? ex.getMessage() : message).showException(ex);
+    }
+
+    /**
+     * Get resource bundle.
+     * @param rs resource path
+     * @return the resource
+     * @throws MalformedURLException 
+     */
+    public ResourceBundle getResourceBundle(String rs) throws MalformedURLException {
+        return ResourceBundle.getBundle(rs, Locale.getDefault(), new URLClassLoader(new URL[] {(new File(JF_RESOURCES)).toURL()}));
     }
 }
