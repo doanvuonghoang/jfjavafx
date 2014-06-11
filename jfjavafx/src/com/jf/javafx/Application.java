@@ -89,7 +89,8 @@ public class Application extends javafx.application.Application {
      */
     private void _initEnvVars() throws Exception {
         // set jf_home
-        JF_HOME = (new File(Application.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParent();
+//        JF_HOME = (new File(Application.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParent();
+        JF_HOME = System.getProperty("user.dir");
         //set jf_conf path
         JF_CONF = JF_HOME + File.separator + "conf";
         File f = new File(JF_CONF);
