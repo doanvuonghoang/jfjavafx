@@ -26,19 +26,14 @@ import java.util.ResourceBundle;
 import java.util.Stack;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.ToolBar;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
-import org.controlsfx.dialog.Dialogs;
 
 /**
  * FXML Controller class
@@ -114,5 +109,9 @@ public class GlobalController extends Controller {
         if(histPages.peek().equals(oldValue)) return;
         
         histPages.push(oldValue);
+    }
+    
+    public void backToPreviousPage() {
+        _navigate(histPages.pop());
     }
 }
