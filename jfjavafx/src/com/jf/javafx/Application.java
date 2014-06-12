@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
@@ -194,10 +195,57 @@ public class Application extends javafx.application.Application {
             }
         }
         
-        File fxml = new File(JF_TEMPLATES + File.separator + path + ".fxml");
-        Parent root;
+        Node root = getNode(path);
+        cur = new Scene((Parent) root);
+        
+        // navigate to scene
+        this.pStage.setScene(cur);
+        // save scene to map
+        this.sceneMap.put(path, cur);
+    }
+    
+    public void showException(Exception ex) {
+        showException("Exception", ex, null);
+    }
+    
+    public void showException(Exception ex, String message) {
+        showException("Exception", ex, message);
+    }
+    
+    public void showException(String title, Exception ex, String message) {
+        Dialogs.create().title(title).message(message == null ? ex.getMessage() : message).showException(ex);
+    }
+
+    /**
+     * Get resource bundle.
+     * @param rs resource path
+     * @return the resource
+     * @throws MalformedURLException 
+     */
+    public ResourceBundle getResourceBundle(String rs) throws MalformedURLException {
+        return ResourceBundle.getBundle(rs, Locale.getDefault(), new URLClassLoader(new URL[] {(new File(JF_RESOURCES)).toURL()}));
+    }
+    
+    /**
+     * Get template file.
+     * @param path
+     * @return 
+     */
+    public File getTemplateFile(String path) {
+        return new File(JF_TEMPLATES + File.separator + path + ".fxml");
+    }
+    
+    /**
+     * Load a node and its controller.
+     * @param app
+     * @param path
+     * @return the node
+     */
+    public Node getNode(String path) {
+        final Application app = this;
+        File fxml = getTemplateFile(path);
+        Node root;
         try {
-            final Application app = this;
             ResourceBundle rb;
             try {
                 rb = getResourceBundle("controllers/" + path);
@@ -231,32 +279,7 @@ public class Application extends javafx.application.Application {
             
             root = new AnchorPane();
         }
-        cur = new Scene(root);
-        this.sceneMap.put(path, cur);
         
-        // navigate to scene
-        this.pStage.setScene(cur);
-    }
-    
-    public void showException(Exception ex) {
-        showException("Exception", ex, null);
-    }
-    
-    public void showException(Exception ex, String message) {
-        showException("Exception", ex, message);
-    }
-    
-    public void showException(String title, Exception ex, String message) {
-        Dialogs.create().title(title).message(message == null ? ex.getMessage() : message).showException(ex);
-    }
-
-    /**
-     * Get resource bundle.
-     * @param rs resource path
-     * @return the resource
-     * @throws MalformedURLException 
-     */
-    public ResourceBundle getResourceBundle(String rs) throws MalformedURLException {
-        return ResourceBundle.getBundle(rs, Locale.getDefault(), new URLClassLoader(new URL[] {(new File(JF_RESOURCES)).toURL()}));
+        return root;
     }
 }
