@@ -60,8 +60,8 @@ public class GlobalController extends Controller {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        mainPane.getChildren().add(ActionUtils.createMenuBar(_getMenuActions()));
-        mainPane.getChildren().add(ActionUtils.createToolBar(_getToolBarActions(), ActionUtils.ActionTextBehavior.SHOW));
+//        mainPane.getChildren().add(ActionUtils.createMenuBar(_getMenuActions()));
+//        mainPane.getChildren().add(ActionUtils.createToolBar(_getToolBarActions(), ActionUtils.ActionTextBehavior.SHOW));
         
         mainContent = new Pane();
         mainContent.idProperty().set("mainContent");

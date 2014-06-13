@@ -19,21 +19,45 @@ package com.jf.javafx.datamodel;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import java.util.Date;
 
 /**
  *
  * @author Hoàng Doãn
  */
 @DatabaseTable(tableName = "Permissions")
-public class Permission {
+public class GroupPermission {
+    public static final int ACTION_CANVIEW      = 0x0007;
+    public static final int ACTION_CANEDIT      = 0x0070;
+    public static final int ACTION_CANDELETE    = 0x0700;
+    public static final int ACTION_CANEXECUTE   = 0x7000;
+    
     @DatabaseField(id = true, generatedId = true)
     public long id;
     
+    @DatabaseField(foreign = true, uniqueCombo = true, canBeNull = false)
+    public Group group;
     
-    
+    @DatabaseField(uniqueCombo = true)
     public long objectId;
     
-    public String objectType;
+    @DatabaseField(uniqueCombo = true)
+    public String objectClassName;
     
+    @DatabaseField
+    public int action;
     
+    @DatabaseField(canBeNull = false)
+    public Date createdTime;
+    
+    @DatabaseField(canBeNull = false, foreign = true)
+    public User creator;
+    
+    @DatabaseField
+    public Date lastModifiedTime;
+    
+    @DatabaseField(foreign = true)
+    public User lastModifier;
+    
+    public GroupPermission() {}
 }

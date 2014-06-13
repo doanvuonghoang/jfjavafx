@@ -125,7 +125,8 @@ public class Application extends javafx.application.Application {
         primaryStage.setTitle(JF_HOME);
         
         // test load fxml
-        navigate("Global", false);
+        if(config.getBoolean("installed", false)) navigate("Global", false);
+        else navigate("Install");
         
         // handle on closing window
         primaryStage.setOnCloseRequest((WindowEvent event) -> {
@@ -180,7 +181,7 @@ public class Application extends javafx.application.Application {
         return config;
     }
     
-    public void navigate(String path) throws Exception {
+    public void navigate(String path) {
         navigate(path, false);
     }
     
@@ -198,7 +199,12 @@ public class Application extends javafx.application.Application {
         Node root = getNode(path);
         cur = new Scene((Parent) root);
         
-        // navigate to scene
+        try {
+            // navigate to scene
+            cur.getStylesheets().add(getResource("global.css").toURL().toString());
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.pStage.setScene(cur);
         // save scene to map
         this.sceneMap.put(path, cur);
@@ -215,6 +221,14 @@ public class Application extends javafx.application.Application {
     public void showException(String title, Exception ex, String message) {
         Dialogs.create().title(title).message(message == null ? ex.getMessage() : message).showException(ex);
     }
+    
+    public void showInformation(String title, String message) {
+        Dialogs.create().title(title).message(message).showInformation();
+    }
+    
+    public org.controlsfx.control.action.Action showConfirm(String title, String message) {
+        return Dialogs.create().title(title).message(message).showConfirm();
+    }
 
     /**
      * Get resource bundle.
@@ -224,6 +238,15 @@ public class Application extends javafx.application.Application {
      */
     public ResourceBundle getResourceBundle(String rs) throws MalformedURLException {
         return ResourceBundle.getBundle(rs, Locale.getDefault(), new URLClassLoader(new URL[] {(new File(JF_RESOURCES)).toURL()}));
+    }
+    
+    /**
+     * Get resource of application context.
+     * @param path
+     * @return 
+     */
+    public File getResource(String path) {
+        return new File(JF_RESOURCES + File.separator + path);
     }
     
     /**
@@ -281,5 +304,9 @@ public class Application extends javafx.application.Application {
         }
         
         return root;
+    }
+    
+    public Scene getCurrentScene() {
+        return pStage.getScene();
     }
 }

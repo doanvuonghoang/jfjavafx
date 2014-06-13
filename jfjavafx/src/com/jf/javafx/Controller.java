@@ -17,6 +17,8 @@
 
 package com.jf.javafx;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 
 /**
@@ -29,9 +31,19 @@ public abstract class Controller implements Initializable {
      */
     protected Application app;
     
+    protected URL location;
+    
+    protected ResourceBundle resources;
+    
     public Controller() {}
     
     public Controller(Application app) {
         this.app = app;
+    }
+    
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        this.location = location;
+        this.resources = resources;
     }
 }
