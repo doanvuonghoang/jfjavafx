@@ -27,12 +27,20 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
+import org.controlsfx.validation.Severity;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 /**
  *
@@ -57,8 +65,26 @@ public class InstallController extends Controller {
     @FXML
     private PasswordField txtAppPassConfirm;
     
+    @FXML
+    private Button btnNext;
+    
     public InstallController(Application app) {
         super(app);
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        super.initialize(location, resources); //To change body of generated methods, choose Tools | Templates.
+        
+        ValidationSupport vs = new ValidationSupport();
+        vs.registerValidator(txtDBUrl, true, Validator.createEmptyValidator(this.resources.getString("urlnotnull.text")));
+        vs.registerValidator(txtAppUser, true, Validator.createEmptyValidator(this.resources.getString("usernotnull.text")));
+        vs.registerValidator(txtAppPassConfirm, (Control t, String u) -> {
+            return ValidationResult.fromErrorIf(t, this.resources.getString("passConfirm.text"), !txtAppPass.getText().equals(txtAppPassConfirm.getText()));
+        });
+        vs.validationResultProperty().addListener((ObservableValue<? extends ValidationResult> observable, ValidationResult oldValue, ValidationResult newValue) -> {
+            btnNext.setDisable(vs.isInvalid());
+        });
     }
     
     public void onNext_Click(ActionEvent e) {

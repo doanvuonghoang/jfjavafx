@@ -26,10 +26,6 @@
                <children>
                   <Label text="%lbDatabaseUrl.text" />
                   <TextField fx:id="txtDBUrl" prefHeight="25.0" prefWidth="246.0" promptText="%txtDBUrlPromt.text" />
-                  <Label text="%lbDBUser.text" />
-                  <TextField fx:id="txtDBUser" prefHeight="25.0" prefWidth="247.0" promptText="%txtDBUserPromt.text" />
-                  <Label text="%lbDBPass.text" />
-                  <PasswordField fx:id="txtDBPass" promptText="%txtDBPassPromt.text" />
                </children>
             </VBox>
         </content>
@@ -57,7 +53,7 @@
                      </padding>
                   </Pane>
                   <Button id="btnPre" disable="true" text="%lbPrevious.text" />
-                  <Button id="btnNext" fx:id="btnNext" defaultButton="true" onAction="#onNext_Click" text="%lbNext.text" />
+                  <Button id="btnNext" fx:id="btnNext" defaultButton="true" disable="true" onAction="#onNext_Click" text="%lbNext.text" />
                   <Button id="btnCancel" fx:id="btnCancel" cancelButton="true" onAction="#onCancel_Click" text="%lbCancel.text" />
                </children>
                <opaqueInsets>
