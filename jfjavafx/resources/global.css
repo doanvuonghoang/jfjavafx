@@ -6,3 +6,82 @@
     -fx-font-size: 14px;
     -fx-font-family: "Times New Roman";
 }
+
+#root {
+    /*-fx-background-color: #333333;*/
+    -fx-border-color: #333333;
+    /*-fx-padding: 1px;*/
+}
+#ModalDimmer {
+    -fx-background-color: rgb(0,0,0,0.5);
+}
+#mainToolBar {
+    -fx-padding: 10px;
+    -fx-background-image: url("images/top-bar.png");
+    -fx-background-size: cover;
+    -fx-background-position: left top;
+    -fx-background-repeat: no-repeat;
+}
+#window-resize-button {
+    -fx-background-image: url("images/window-corner.png");
+    -fx-background-position: right 1px bottom 1px;
+    -fx-background-repeat: no-repeat;
+}
+#window-close {
+    -fx-font-size: 1px;
+    -fx-background-color: null;
+    -fx-background-image: url("images/window-close.png");
+    -fx-padding: 6 6 4 6;
+}
+#window-min {
+    -fx-font-size: 1px;
+    -fx-background-color: null;
+    -fx-background-image: url("images/window-min.png");
+    -fx-padding: 6 6 4 6;
+}
+#window-max {
+    -fx-font-size: 1px;
+    -fx-background-color: null;
+    -fx-background-image: url("images/window-expand.png");
+    -fx-padding: 6 6 4 6;
+}
+#window-close:hover {
+    -fx-background-image: url("images/window-close-over.png");
+}
+#window-min:hover {
+    -fx-background-image: url("images/window-min-over.png");
+}
+#window-max:hover {
+    -fx-background-image: url("images/window-expand-over.png");
+}
+#window-close:focused, #window-min:focused , #window-max:focused {
+    -fx-effect: dropshadow( three-pass-box , -fx-focus-color , 5, 0.7 , 0 , 0 );
+}
+
+/* Window Button Styles */
+.window-button {
+    -fx-skin: "com.sun.javafx.scene.control.skin.ButtonSkin";
+    -fx-background-color: #616161, #464646, #505050;
+    -fx-background-insets: 0,1,2;
+    -fx-background-radius: 6,5,4;
+    -fx-padding: 0 0 0 0;
+    /* workaround for button sizing */
+    -fx-font-size: 1px;
+}
+.window-button:focused {
+    -fx-background-color: -fx-accent, #464646, #505050;
+    -fx-background-insets: -0.4,1,2;
+    -fx-background-radius: 6.4,5,4;
+}
+.window-button:hover {
+    -fx-background-color: #616161, white, -fx-accent;
+}
+.window-button:pressed {
+    -fx-background-color: #616161, white, #303030;
+}
+.window-button Rectangle {
+    -fx-fill: #949494;
+}
+.window-button:hover Rectangle {
+    -fx-fill: white;
+}
