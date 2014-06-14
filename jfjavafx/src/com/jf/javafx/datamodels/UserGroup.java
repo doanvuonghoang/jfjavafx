@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.datamodel;
+package com.jf.javafx.datamodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -25,27 +25,19 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Permissions")
-public class GroupPermission {
-    public static final int ACTION_CANVIEW      = 0x0007;
-    public static final int ACTION_CANEDIT      = 0x0070;
-    public static final int ACTION_CANDELETE    = 0x0700;
-    public static final int ACTION_CANEXECUTE   = 0x7000;
-    
+@DatabaseTable(tableName = "UserGroup")
+public class UserGroup {
     @DatabaseField(id = true, generatedId = true)
     public long id;
     
-    @DatabaseField(foreign = true, uniqueCombo = true, canBeNull = false)
+    @DatabaseField(canBeNull = false, foreign = true)
     public Group group;
     
-    @DatabaseField(uniqueCombo = true)
-    public long objectId;
+    @DatabaseField(canBeNull = false, foreign = true)
+    public User user;
     
-    @DatabaseField(uniqueCombo = true)
-    public String objectClassName;
-    
-    @DatabaseField
-    public int action;
+    @DatabaseField(canBeNull = false, defaultValue = "false")
+    public boolean deleted;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
@@ -59,5 +51,5 @@ public class GroupPermission {
     @DatabaseField(foreign = true)
     public User lastModifier;
     
-    public GroupPermission() {}
+    public UserGroup() {}
 }

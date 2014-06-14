@@ -34,12 +34,10 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.TimelineBuilder;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
@@ -89,29 +87,33 @@ public class Application extends javafx.application.Application {
 
     private ResourceBundle rb;
 
-    private Stage pStage;
-    private Dictionary<String, Node> pageMap = new Hashtable<String, Node>();
-    private WindowResizeButton windowResizeButton;
-    private BorderPane root;
-    private StackPane modalDimmer;
-    private double mouseDragOffsetX = 0;
-    private double mouseDragOffsetY = 0;
+    private Dictionary<Class, Service> services = new Hashtable();
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        _initEnvVars();
-        // load properties
-        _initConfigurations();
-        _initStage(primaryStage);
-    }
+    private Stage pStage;
 
     /**
-     * Start application
+     * Start the application
      *
-     * @param args
+     * @param primaryStage
      */
-    public static void main(String[] args) {
-        launch(args);
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        this.pStage = primaryStage;
+        
+        // set env variables
+        _initVars();
+        // load properties
+        _initConfigurations();
+
+        _initStartupServices();
+
+        // handle on closing window
+        primaryStage.setOnHidden((WindowEvent event) -> {
+            _commitProperties();
+        });
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
+        primaryStage.setTitle(getResourceBundle().getString("app.title"));
+        primaryStage.show();
     }
 
     /**
@@ -119,7 +121,7 @@ public class Application extends javafx.application.Application {
      *
      * @throws Exception
      */
-    private void _initEnvVars() throws Exception {
+    private void _initVars() throws Exception {
         // set jf_home
 //        JF_HOME = (new File(Application.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParent();
         JF_HOME = System.getProperty("user.dir");
@@ -142,111 +144,33 @@ public class Application extends javafx.application.Application {
             f.mkdirs();
         }
     }
-
+    
     /**
-     * Start the application
-     *
-     * @param primaryStage
+     * Initialize configurations.
      */
-    private void _initStage(Stage primaryStage) throws IOException {
-        this.pStage = primaryStage;
-        primaryStage.initStyle(StageStyle.TRANSPARENT);
-        primaryStage.setTitle(getResourceBundle().getString("app.title"));
-        
-        windowResizeButton = new WindowResizeButton(primaryStage, 1020,700);
-        
-        //Stack layer
-        StackPane layerPane = new StackPane();
-        Scene s = new Scene(layerPane);
-        s.getStylesheets().add(getResource("global.css").toURL().toString());
-        
-        // create root
-        root = new BorderPane() {
-            @Override protected void layoutChildren() {
-                super.layoutChildren();
-                windowResizeButton.autosize();
-                windowResizeButton.setLayoutX(getWidth() - windowResizeButton.getLayoutBounds().getWidth());
-                windowResizeButton.setLayoutY(getHeight() - windowResizeButton.getLayoutBounds().getHeight());
+    private void _initConfigurations() {
+        File f = new File(_getJFPropertiesFile());
+        if (f.exists()) {
+            try {
+                config = new XMLConfiguration(f);
+            } catch (ConfigurationException ex) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             }
-        };
-        root.getStyleClass().add("application");
-        root.setId("root");
-        layerPane.getChildren().add(root);
-
-        // create modal dimmer, to dim screen when showing modal dialogs
-        modalDimmer = new StackPane();
-        modalDimmer.setId("ModalDimmer");
-        modalDimmer.setOnMouseClicked((MouseEvent t) -> {
-            t.consume();
-            hideModalMessage();
-        });
-        modalDimmer.setVisible(false);
-        layerPane.getChildren().add(modalDimmer);
-        
-        // create main toolbar
-        ToolBar toolBar = new ToolBar();
-        toolBar.setId("mainToolBar");
-        ImageView logo = new ImageView(new Image(getResource("logo.png").toURL().toString()));
-        HBox.setMargin(logo, new Insets(0,0,0,5));
-        toolBar.getItems().add(logo);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        toolBar.getItems().add(spacer);
-        
-        // add close min max
-        final WindowButtons windowButtons = new WindowButtons(primaryStage);
-        toolBar.getItems().add(windowButtons);
-        // add window header double clicking
-        toolBar.setOnMouseClicked((MouseEvent event) -> {
-            if (event.getClickCount() == 2) {
-                windowButtons.toogleMaximized();
-            }
-        });
-        // add window dragging
-        toolBar.setOnMousePressed((MouseEvent event) -> {
-            mouseDragOffsetX = event.getSceneX();
-            mouseDragOffsetY = event.getSceneY();
-        });
-        toolBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
-                if(!windowButtons.isMaximized()) {
-                    primaryStage.setX(event.getScreenX()-mouseDragOffsetX);
-                    primaryStage.setY(event.getScreenY()-mouseDragOffsetY);
-                }
-            }
-        });
-        
-        root.setTop(toolBar);
-        // add window resize button so its on top
-        windowResizeButton.setManaged(false);
-        root.getChildren().add(windowResizeButton);
-        
-        if (config.getBoolean("installed", false)) {
-            navigate(config.getString("default_scene", "Global"), false);
         } else {
-            navigate(config.getString("install_scene", "Install"));
+            config = new XMLConfiguration();
+            ((XMLConfiguration) getConfiguration()).setFileName(_getJFPropertiesFile());
         }
-
-        // handle on closing window
-        primaryStage.setOnCloseRequest((WindowEvent event) -> {
-            _commitProperties();
-        });
-
-        primaryStage.setScene(s);
-        primaryStage.show();
     }
-
-    public ResourceBundle getResourceBundle() throws MalformedURLException {
-        if (this.rb == null) {
-            String s = null;
-            if ((s = config.getString("resource_bundle")) == null) {
-                s = "App";
-                config.setProperty("resource_bundle", s);
+    
+    private void _initStartupServices() {
+        for(String cls : config.getStringArray("startup_services.service")) {
+            try {
+                Class<?> p = Class.forName(cls);
+                getService((Class<Service>) p);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             }
-            this.rb = getResourceBundle(s);
         }
-        
-        return this.rb;
     }
 
     /**
@@ -268,22 +192,18 @@ public class Application extends javafx.application.Application {
             Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    /**
-     * Initialize configurations.
-     */
-    private void _initConfigurations() {
-        File f = new File(_getJFPropertiesFile());
-        if (f.exists()) {
-            try {
-                config = new XMLConfiguration(f);
-            } catch (ConfigurationException ex) {
-                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+    
+    public ResourceBundle getResourceBundle() throws MalformedURLException {
+        if (this.rb == null) {
+            String s = null;
+            if ((s = config.getString("resource_bundle")) == null) {
+                s = "App";
+                config.setProperty("resource_bundle", s);
             }
-        } else {
-            config = new XMLConfiguration();
-            ((XMLConfiguration) getConfiguration()).setFileName(_getJFPropertiesFile());
+            this.rb = getResourceBundle(s);
         }
+
+        return this.rb;
     }
 
     /**
@@ -295,53 +215,25 @@ public class Application extends javafx.application.Application {
         return config;
     }
 
-    public void navigate(String path) {
-        navigate(path, false);
-    }
-
-    public void navigate(String path, boolean refresh) {
-        // check if have scene
-        Node cur = this.pageMap.get(path);
-
-        if (cur != null) {
-            if (!refresh) {
-                _setDisplayNode(cur);
-                return; // end navigation here
+    /**
+     * Get a running service of application
+     * @param <T> class extends Service
+     * @param n class of T
+     * @return the service object
+     */
+    public <T extends Service> T getService(Class<T> n) {
+        Service s = this.services.get(n);
+        if (s == null) {
+            try {
+                s = (T) n.newInstance();
+                s.init(this);
+                this.services.put(n, s);
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
-        // can inject controls here
-        cur = getNode(path);
-
-        _setDisplayNode(cur);
-        // save scene to map
-        this.pageMap.put(path, cur);
-    }
-    
-    private void _setDisplayNode(Node n) {
-//        this.root.getChildren().clear();
-//        this.root.getChildren().add(n);
-        this.root.setCenter(n);
-    }
-
-    public void showException(Exception ex) {
-        showException("Exception", ex, null);
-    }
-
-    public void showException(Exception ex, String message) {
-        showException("Exception", ex, message);
-    }
-
-    public void showException(String title, Exception ex, String message) {
-        Dialogs.create().title(title).message(message == null ? ex.getMessage() : message).showException(ex);
-    }
-
-    public void showInformation(String title, String message) {
-        Dialogs.create().title(title).message(message).showInformation();
-    }
-
-    public org.controlsfx.control.action.Action showConfirm(String title, String message) {
-        return Dialogs.create().title(title).message(message).showConfirm();
+        return (T) s;
     }
 
     /**
@@ -377,25 +269,24 @@ public class Application extends javafx.application.Application {
 
     /**
      * Load a node and its controller.
-     *
-     * @param app
+     * 
      * @param path
      * @return the node
      */
-    public Node getNode(String path) {
+    public Node createNode(String path) {
         final Application app = this;
         File fxml = getTemplateFile(path);
-        Node root;
+        Node node;
         try {
-            ResourceBundle rb;
+            ResourceBundle bundle;
             try {
-                rb = getResourceBundle("controllers/" + path);
-            } catch (Exception ex) {
+                bundle = getResourceBundle("controllers/" + path);
+            } catch (MalformedURLException ex) {
                 Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
-                rb = null;
+                bundle = null;
             }
 
-            root = FXMLLoader.load(fxml.toURL(), rb, new JavaFXBuilderFactory(), (Class<?> param) -> {
+            node = FXMLLoader.load(fxml.toURL(), bundle, new JavaFXBuilderFactory(), (Class<?> param) -> {
                 try {
                     Class cls = Controller.class;
 
@@ -410,61 +301,38 @@ public class Application extends javafx.application.Application {
                         return param.newInstance();
                     }
                 } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | SecurityException ex) {
-                    showException(ex);
+                    MsgBox.showException(ex);
                     return null;
                 }
             });
         } catch (IOException ex) {
             Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
-            showException(ex, "Error while navigate to path: " + path);
+            MsgBox.showException(ex, "Error while navigate to path: " + path);
 
-            root = new AnchorPane();
+            node = new AnchorPane();
         }
 
-        return root;
+        return node;
+    }
+    
+    public Stage getStage() {
+        return this.pStage;
     }
 
-    public Scene getCurrentScene() {
+    public Scene getScene() {
         return pStage.getScene();
     }
     
-    /**
-     * Show the given node as a floating dialog over the whole application, with 
-     * the rest of the application dimmed out and blocked from mouse events.
-     * 
-     * @param message 
-     */
-    public void showModalMessage(Node message) {
-        modalDimmer.getChildren().add(message);
-        modalDimmer.setOpacity(0);
-        modalDimmer.setVisible(true);
-        modalDimmer.setCache(true);
-        TimelineBuilder.create().keyFrames(
-            new KeyFrame(Duration.seconds(1), 
-                new EventHandler<ActionEvent>() {
-                    public void handle(ActionEvent t) {
-                        modalDimmer.setCache(false);
-                    }
-                },
-                new KeyValue(modalDimmer.opacityProperty(),1, Interpolator.EASE_BOTH)
-        )).build().play();
+    public void setScene(Scene s) {
+        pStage.setScene(s);
     }
-    
+
     /**
-     * Hide any modal message that is shown
+     * Start application
+     *
+     * @param args
      */
-    public void hideModalMessage() {
-        modalDimmer.setCache(true);
-        TimelineBuilder.create().keyFrames(
-            new KeyFrame(Duration.seconds(1), 
-                new EventHandler<ActionEvent>() {
-                    public void handle(ActionEvent t) {
-                        modalDimmer.setCache(false);
-                        modalDimmer.setVisible(false);
-                        modalDimmer.getChildren().clear();
-                    }
-                },
-                new KeyValue(modalDimmer.opacityProperty(),0, Interpolator.EASE_BOTH)
-        )).build().play();
+    public static void main(String[] args) {
+        launch(args);
     }
 }

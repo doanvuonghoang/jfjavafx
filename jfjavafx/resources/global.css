@@ -4,7 +4,7 @@
 
 .root {
     -fx-font-size: 14px;
-    -fx-font-family: "Times New Roman";
+    /*-fx-font-family: "Times New Roman";*/
 }
 
 #root {

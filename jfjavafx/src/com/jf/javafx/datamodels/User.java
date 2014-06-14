@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.datamodel;
+package com.jf.javafx.datamodels;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 
@@ -25,19 +27,28 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Groups")
-public class Group {
+@DatabaseTable(tableName = "Users")
+public class User {
     @DatabaseField(id = true, generatedId = true)
     public long id;
     
     @DatabaseField(unique = true, canBeNull = false)
-    public String name;
+    public String userName;
+    
+    @DatabaseField(canBeNull = false)
+    public String password;
     
     @DatabaseField(canBeNull = false, defaultValue = "true")
     public boolean valid;
     
     @DatabaseField(canBeNull = false, defaultValue = "false")
     public boolean deleted;
+    
+    @DatabaseField(canBeNull = false, defaultValue = "false")
+    public boolean mustChangePass;
+    
+    @DatabaseField
+    public Date lastChangePass;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
@@ -51,5 +62,11 @@ public class Group {
     @DatabaseField(foreign = true)
     public User lastModifier;
     
-    public Group() {}
+    @DatabaseField(canBeNull = false, defaultValue = "0")
+    public int loginFailedCount;
+    
+    @ForeignCollectionField
+    public ForeignCollection<Profile> profile;
+
+    public User() {}
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.datamodel;
+package com.jf.javafx.datamodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -25,22 +25,27 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Profiles")
-public class Profile {
+@DatabaseTable(tableName = "Permissions")
+public class GroupPermission {
+    public static final int ACTION_CANVIEW      = 0x0007;
+    public static final int ACTION_CANEDIT      = 0x0070;
+    public static final int ACTION_CANDELETE    = 0x0700;
+    public static final int ACTION_CANEXECUTE   = 0x7000;
+    
     @DatabaseField(id = true, generatedId = true)
     public long id;
     
-    @DatabaseField(unique = true, canBeNull = false, foreign = true)
-    public User user;
+    @DatabaseField(foreign = true, uniqueCombo = true, canBeNull = false)
+    public Group group;
+    
+    @DatabaseField(uniqueCombo = true)
+    public long objectId;
+    
+    @DatabaseField(uniqueCombo = true)
+    public String objectClassName;
     
     @DatabaseField
-    public String address;
-    
-    @DatabaseField
-    public String phone;
-    
-    @DatabaseField
-    public String email;
+    public int action;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
@@ -54,5 +59,5 @@ public class Profile {
     @DatabaseField(foreign = true)
     public User lastModifier;
     
-    public Profile() {}
+    public GroupPermission() {}
 }

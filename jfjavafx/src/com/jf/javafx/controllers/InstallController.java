@@ -21,6 +21,7 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.jf.javafx.Application;
 import com.jf.javafx.Controller;
+import com.jf.javafx.MsgBox;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -89,18 +90,16 @@ public class InstallController extends Controller {
             // check for database connection
             ConnectionSource cs = new JdbcConnectionSource(txtDBUrl.getText());
         } catch (Exception ex) {
-            this.app.showException(this.resources.getString("dialog.cancel.title"), ex, ex.getLocalizedMessage());
+            MsgBox.showException(this.resources.getString("dialog.cancel.title"), ex, ex.getLocalizedMessage());
             Logger.getLogger(InstallController.class.getName()).log(Level.SEVERE, null, ex);
             
             return;
         }
-        
-        
     }
     
     public void onCancel_Click(ActionEvent e) {
         try {
-            Action r = this.app.showConfirm(this.resources.getString("dialog.cancel.title"), this.resources.getString("dialog.cancel.text"));
+            Action r = MsgBox.showConfirm(this.resources.getString("dialog.cancel.title"), this.resources.getString("dialog.cancel.text"));
             if(r == Dialog.Actions.YES) Platform.exit();
         } catch (Exception ex) {
             Logger.getLogger(InstallController.class.getName()).log(Level.SEVERE, null, ex);

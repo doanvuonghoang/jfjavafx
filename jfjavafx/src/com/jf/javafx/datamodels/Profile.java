@@ -15,11 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.datamodel;
+package com.jf.javafx.datamodels;
 
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 
@@ -27,28 +25,22 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Users")
-public class User {
+@DatabaseTable(tableName = "Profiles")
+public class Profile {
     @DatabaseField(id = true, generatedId = true)
     public long id;
     
-    @DatabaseField(unique = true, canBeNull = false)
-    public String userName;
-    
-    @DatabaseField(canBeNull = false)
-    public String password;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "true")
-    public boolean valid;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "false")
-    public boolean deleted;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "false")
-    public boolean mustChangePass;
+    @DatabaseField(unique = true, canBeNull = false, foreign = true)
+    public User user;
     
     @DatabaseField
-    public Date lastChangePass;
+    public String address;
+    
+    @DatabaseField
+    public String phone;
+    
+    @DatabaseField
+    public String email;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
@@ -62,11 +54,5 @@ public class User {
     @DatabaseField(foreign = true)
     public User lastModifier;
     
-    @DatabaseField(canBeNull = false, defaultValue = "0")
-    public int loginFailedCount;
-    
-    @ForeignCollectionField
-    public ForeignCollection<Profile> profile;
-
-    public User() {}
+    public Profile() {}
 }
