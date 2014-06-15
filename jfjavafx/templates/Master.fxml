@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jf.javafx.controllers.MasterController">
+   <children>
+      <BorderPane>
+         <center>
+            <BorderPane id="contentPane" fx:id="contentPane" BorderPane.alignment="CENTER">
+               <top>
+                  <MenuBar id="menuBar" fx:id="menuBar" BorderPane.alignment="CENTER" />
+               </top>
+            </BorderPane>
+         </center>
+         <top>
+            <ToolBar id="head-title" fx:id="headPane">
+               <items>
+                  <ImageView fx:id="imgLogo" />
+                  <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                  <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                     <children>
+                        <Button id="window-close" fx:id="btnWClose" mnemonicParsing="false" />
+                        <Button id="window-min" fx:id="btnWMin" mnemonicParsing="false" />
+                        <Button id="window-max" fx:id="btnWMax" mnemonicParsing="false" />
+                     </children>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                  </VBox>
+               </items>
+            </ToolBar>
+         </top>
+      </BorderPane>
+      <StackPane fx:id="modalDimmer" visible="false" />
+   </children>
+</StackPane>

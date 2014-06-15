@@ -12,10 +12,10 @@
     -fx-border-color: #333333;
     /*-fx-padding: 1px;*/
 }
-#ModalDimmer {
+#modal-dimmer {
     -fx-background-color: rgb(0,0,0,0.5);
 }
-#mainToolBar {
+#head-title {
     -fx-padding: 10px;
     -fx-background-image: url("images/top-bar.png");
     -fx-background-size: cover;

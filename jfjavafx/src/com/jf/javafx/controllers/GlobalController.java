@@ -100,7 +100,7 @@ public class GlobalController extends Controller {
             return;
         }
         
-        Node page = this.app.createNode(newValue);
+        Node page = this.app.createNode(newValue).first;
         _setPage(page);
         pageMap.put(newValue, page);
     }

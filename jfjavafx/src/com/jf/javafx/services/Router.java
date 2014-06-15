@@ -32,7 +32,7 @@ public class Router extends AbstractService {
     @Override
     protected void _initService() {
         if (appConfig.getBoolean("installed", false)) {
-            navigate(appConfig.getString("default_scene", "Global"), false);
+            navigate(appConfig.getString("default_scene", "Index"), false);
         } else {
             navigate(appConfig.getString("install_scene", "Install"));
         }
@@ -48,15 +48,15 @@ public class Router extends AbstractService {
 
         if (cur != null) {
             if (!refresh) {
-                app.getService(SetupUI.class).setContent(cur);
+                app.getService(UI.class).setContent(cur);
                 return; // end navigation here
             }
         }
 
         // can inject controls here
-        cur = app.createNode(path);
+        cur = app.createNode(path).first;
 
-        app.getService(SetupUI.class).setContent(cur);
+        app.getService(UI.class).setContent(cur);
         // save scene to map
         this.pageMap.put(path, cur);
     }

@@ -16,8 +16,6 @@
  */
 package com.jf.javafx;
 
-import ensemble.controls.WindowButtons;
-import ensemble.controls.WindowResizeButton;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -29,34 +27,17 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.TimelineBuilder;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ToolBar;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import javafx.util.Duration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.controlsfx.dialog.Dialogs;
 
 /**
  *
@@ -273,10 +254,11 @@ public class Application extends javafx.application.Application {
      * @param path
      * @return the node
      */
-    public Node createNode(String path) {
+    public Pair<Node, ?> createNode(String path) {
         final Application app = this;
         File fxml = getTemplateFile(path);
         Node node;
+        Object controller = null;
         try {
             ResourceBundle bundle;
             try {
@@ -286,7 +268,7 @@ public class Application extends javafx.application.Application {
                 bundle = null;
             }
 
-            node = FXMLLoader.load(fxml.toURL(), bundle, new JavaFXBuilderFactory(), (Class<?> param) -> {
+            FXMLLoader loader = new FXMLLoader(fxml.toURL(), bundle, new JavaFXBuilderFactory(), (Class<?> param) -> {
                 try {
                     Class cls = Controller.class;
 
@@ -305,6 +287,8 @@ public class Application extends javafx.application.Application {
                     return null;
                 }
             });
+            node = loader.load();
+            controller = loader.getController();
         } catch (IOException ex) {
             Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             MsgBox.showException(ex, "Error while navigate to path: " + path);
@@ -312,7 +296,7 @@ public class Application extends javafx.application.Application {
             node = new AnchorPane();
         }
 
-        return node;
+        return new Pair(node, controller);
     }
     
     public Stage getStage() {
