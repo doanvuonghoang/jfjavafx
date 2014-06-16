@@ -76,6 +76,7 @@ public class Application extends javafx.application.Application {
      * Start the application
      *
      * @param primaryStage
+     * @throws java.lang.Exception
      */
     @Override
     public void start(Stage primaryStage) throws Exception {

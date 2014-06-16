@@ -21,8 +21,6 @@ import com.jf.javafx.AbstractService;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import javafx.scene.Node;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 
 /**
  *
