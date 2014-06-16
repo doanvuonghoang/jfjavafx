@@ -68,7 +68,7 @@ public class Application extends javafx.application.Application {
 
     private ResourceBundle rb;
 
-    private Dictionary<Class, Service> services = new Hashtable();
+    private final Dictionary<Class, Service> services = new Hashtable();
 
     private Stage pStage;
 
@@ -237,6 +237,10 @@ public class Application extends javafx.application.Application {
     public File getResource(String path) {
         return new File(JF_RESOURCES + File.separator + path);
     }
+    
+    public File getConfig(String path) {
+        return new File(JF_CONF + File.separator + path);
+    }
 
     /**
      * Get template file.
@@ -263,7 +267,7 @@ public class Application extends javafx.application.Application {
             ResourceBundle bundle;
             try {
                 bundle = getResourceBundle("controllers/" + path);
-            } catch (MalformedURLException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
                 bundle = null;
             }
@@ -293,7 +297,14 @@ public class Application extends javafx.application.Application {
             Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             MsgBox.showException(ex, "Error while navigate to path: " + path);
 
-            node = new AnchorPane();
+            // customize error screen
+            AnchorPane p = new AnchorPane();
+            
+//            StringWriter sw = new StringWriter();
+//            ex.printStackTrace(new PrintWriter(sw));
+//            p.getChildren().add(new Label(sw.toString()));
+
+            node = p;
         }
 
         return new Pair(node, controller);

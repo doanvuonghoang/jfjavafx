@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jf.javafx.controllers;
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -22,6 +21,8 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.jf.javafx.Application;
 import com.jf.javafx.Controller;
 import com.jf.javafx.MsgBox;
+import com.jf.javafx.services.Router;
+import com.jf.javafx.services.Security;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -35,6 +36,10 @@ import javafx.scene.control.Control;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.LockedAccountException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.validation.ValidationResult;
@@ -45,65 +50,50 @@ import org.controlsfx.validation.Validator;
  *
  * @author Hoàng Doãn
  */
-public class InstallController extends Controller {
+public class LoginController extends Controller {
+
     @FXML
-    private TextField txtDBUrl;
-    
+    private TextField txtUser;
+
     @FXML
-    private TextField txtDBUser;
-    
+    private PasswordField txtPass;
+
     @FXML
-    private PasswordField txtDBPass;
-    
-    @FXML
-    private TextField txtAppUser;
-    
-    @FXML
-    private PasswordField txtAppPass;
-    
-    @FXML
-    private PasswordField txtAppPassConfirm;
-    
-    @FXML
-    private Button btnNext;
-    
-    public InstallController(Application app) {
+    private Button btnLogin;
+
+    public LoginController(Application app) {
         super(app);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources); //To change body of generated methods, choose Tools | Templates.
-        
+
         ValidationSupport vs = new ValidationSupport();
-        vs.registerValidator(txtDBUrl, true, Validator.createEmptyValidator(this.resources.getString("urlnotnull.text")));
-        vs.registerValidator(txtAppUser, true, Validator.createEmptyValidator(this.resources.getString("usernotnull.text")));
-        vs.registerValidator(txtAppPassConfirm, (Control t, String u) -> {
-            return ValidationResult.fromErrorIf(t, this.resources.getString("passConfirm.text"), !txtAppPass.getText().equals(txtAppPassConfirm.getText()));
-        });
+        vs.registerValidator(txtUser, true, Validator.createEmptyValidator(this.resources.getString("usernotnull.text")));
+
         vs.validationResultProperty().addListener((ObservableValue<? extends ValidationResult> observable, ValidationResult oldValue, ValidationResult newValue) -> {
-            btnNext.setDisable(vs.isInvalid());
+            btnLogin.setDisable(vs.isInvalid());
         });
     }
-    
-    public void onNext_Click(ActionEvent e) {
+
+    public void onLogin(ActionEvent e) {
         try {
-            // check for database connection
-            ConnectionSource cs = new JdbcConnectionSource(txtDBUrl.getText());
-        } catch (Exception ex) {
-            MsgBox.showException(this.resources.getString("dialog.cancel.title"), ex, ex.getLocalizedMessage());
-            Logger.getLogger(InstallController.class.getName()).log(Level.SEVERE, null, ex);
-            
-            return;
+            app.getService(Security.class).login(txtUser.getText(), txtPass.getText());
+        } catch (UnknownAccountException uae) {
+            //username wasn't in the system, show them an error message?
+            MsgBox.showNotification(resources.getString("unknownAccount.text"), resources.getString("loginFailed.title"), app.getStage());
+        } catch (IncorrectCredentialsException ice) {
+            //password didn't match, try again?
+            MsgBox.showNotification(resources.getString("wrongPassword.text"), resources.getString("loginFailed.title"), app.getStage());
+        } catch (LockedAccountException lae) {
+            //account for that username is locked - can't login.  Show them a message?
+            MsgBox.showNotification(resources.getString("lockedAccount.text"), resources.getString("loginFailed.title"), app.getStage());
+        } catch (AuthenticationException ae) {
+            //unexpected condition - error?
+            MsgBox.showNotification(ae.getMessage(), resources.getString("loginFailed.title"), app.getStage());
         }
-    }
-    
-    public void onCancel_Click(ActionEvent e) {
-        try {
-            Action r = MsgBox.showConfirm(this.resources.getString("dialog.cancel.title"), this.resources.getString("dialog.cancel.text"));
-            if(r == Dialog.Actions.YES) Platform.exit();
-        } catch (Exception ex) {
-            Logger.getLogger(InstallController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
+        app.getService(Router.class).back();
     }
 }

@@ -20,19 +20,27 @@ package com.jf.javafx.services;
 import com.jf.javafx.AbstractService;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Stack;
 import javafx.scene.Node;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 /**
  *
  * @author Hoàng Doãn
  */
 public class Router extends AbstractService {
-    private Dictionary<String, Node> pageMap = new Hashtable();
+    private final Dictionary<String, Node> pageMap = new Hashtable();
+    private String lastScene = "", curScene = "";
+    
 
     @Override
     protected void _initService() {
         if (appConfig.getBoolean("installed", false)) {
-            navigate(appConfig.getString("default_scene", "Index"), false);
+            Subject currentUser = SecurityUtils.getSubject();
+            if (!currentUser.isAuthenticated()) {
+                navigate(appConfig.getString("authentication.login", "Login"));
+            } else navigate(appConfig.getString("default_scene", "Index"), false);
         } else {
             navigate(appConfig.getString("install_scene", "Install"));
         }
@@ -43,6 +51,11 @@ public class Router extends AbstractService {
     }
 
     public void navigate(String path, boolean refresh) {
+        if(!curScene.isEmpty() && curScene != path) {
+            lastScene = curScene;
+            curScene = path;
+        }
+        
         // check if have scene
         Node cur = this.pageMap.get(path);
 
@@ -61,4 +74,8 @@ public class Router extends AbstractService {
         this.pageMap.put(path, cur);
     }
     
+    public void back() {
+        if(!lastScene.isEmpty()) navigate(lastScene);
+        else navigate(appConfig.getString("default_scene", "Index"), false);
+    }
 }

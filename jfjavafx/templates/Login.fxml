@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import org.controlsfx.control.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox id="mainPane" maxWidth="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jf.javafx.controllers.LoginController">
+   <children>
+      <Pane VBox.vgrow="NEVER">
+         <children>
+            <Label styleClass="head-title" text="%welcome.title" />
+         </children>
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </VBox.margin>
+      </Pane>
+      <VBox spacing="10.0">
+         <children>
+            <Label text="%lbUser.text" />
+            <TextField fx:id="txtUser" prefHeight="25.0" prefWidth="247.0" promptText="%txtUserPromt.text" />
+            <Label text="%lbPass.text" />
+            <PasswordField fx:id="txtPass" promptText="%txtPassPromt.text" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </VBox>
+      <BorderPane VBox.vgrow="NEVER">
+         <right>
+            <HBox spacing="10.0">
+               <children>
+                  <Button id="btnNext" fx:id="btnLogin" defaultButton="true" disable="true" onAction="#onLogin" text="%lbLogin.text" />
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <BorderPane.margin>
+                  <Insets bottom="10.0" right="10.0" top="10.0" />
+               </BorderPane.margin>
+            </HBox>
+         </right>
+      </BorderPane>
+   </children>
+</VBox>

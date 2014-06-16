@@ -17,6 +17,8 @@
 
 package com.jf.javafx;
 
+import javafx.geometry.Pos;
+import org.controlsfx.control.Notifications;
 import org.controlsfx.dialog.Dialogs;
 
 /**
@@ -42,5 +44,13 @@ public class MsgBox {
 
     public static org.controlsfx.control.action.Action showConfirm(String title, String message) {
         return Dialogs.create().title(title).message(message).showConfirm();
+    }
+    
+    public static void showNotification(String message) {
+        Notifications.create().position(Pos.TOP_RIGHT).text(message).showError();
+    }
+    
+    public static void showNotification(String message, String title, Object owner) {
+        Notifications.create().owner(owner).position(Pos.TOP_RIGHT).title(title).text(message).showError();
     }
 }
