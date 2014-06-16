@@ -20,7 +20,6 @@ package com.jf.javafx.services;
 import com.jf.javafx.AbstractService;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Stack;
 import javafx.scene.Node;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -37,10 +36,7 @@ public class Router extends AbstractService {
     @Override
     protected void _initService() {
         if (appConfig.getBoolean("installed", false)) {
-            Subject currentUser = SecurityUtils.getSubject();
-            if (!currentUser.isAuthenticated()) {
-                navigate(appConfig.getString("authentication.login", "Login"));
-            } else navigate(appConfig.getString("default_scene", "Index"), false);
+            navigate(appConfig.getString("default_scene", "Index"), false);
         } else {
             navigate(appConfig.getString("install_scene", "Install"));
         }
@@ -51,7 +47,7 @@ public class Router extends AbstractService {
     }
 
     public void navigate(String path, boolean refresh) {
-        if(!curScene.isEmpty() && curScene != path) {
+        if(!curScene.equals(path) && !curScene.isEmpty()) {
             lastScene = curScene;
             curScene = path;
         }

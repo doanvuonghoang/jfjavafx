@@ -39,6 +39,11 @@ public class Security extends AbstractService {
                 Factory<org.apache.shiro.mgt.SecurityManager> factory = new IniSecurityManagerFactory("url:" + app.getConfig("shiro.ini").toURL().toString());
                 org.apache.shiro.mgt.SecurityManager sm = factory.getInstance();
                 SecurityUtils.setSecurityManager(sm);
+
+                Subject currentUser = SecurityUtils.getSubject();
+                if (!currentUser.isAuthenticated()) {
+                    app.getService(Router.class).navigate(appConfig.getString("authentication.login", "Login"));
+                }
             } catch (MalformedURLException ex) {
                 Logger.getLogger(Security.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -47,13 +52,16 @@ public class Security extends AbstractService {
 
     /**
      * Login.
+     *
      * @param userName
-     * @param rawPassword 
+     * @param rawPassword
      */
     public void login(String userName, String rawPassword) {
         Subject currentUser = SecurityUtils.getSubject();
         if (!currentUser.isAuthenticated()) {
             currentUser.login(new UsernamePasswordToken(userName, rawPassword));
+            
+            app.getService(Router.class).back();
         }
     }
 
