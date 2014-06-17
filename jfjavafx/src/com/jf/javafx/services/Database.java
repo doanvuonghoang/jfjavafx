@@ -20,84 +20,123 @@ import com.jf.javafx.AbstractService;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
+ * This service read application configuration file to extract database
+ * information The structure of database information in file is like:<br/>
+ * <code>database<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;- jndiName<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;- url<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;- username<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;- password<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;- dsProvider (required by jndiName)<br/>
+ * </code>
  *
  * @author Hoàng Doãn
  */
 public class Database extends AbstractService {
 
-    private String dbUrl;
-    private String dbUsername;
-    private String dbPassword;
-    private String jndiName;
-    private String dsProvider;
-
-    private BasicDataSource ds;
+    private Dictionary<String, DBInfo> infos = new Hashtable<>();
+    private Dictionary<String, DataSource> dss = new Hashtable<>();
 
     @Override
     protected void _initService() {
-        dbUrl = appConfig.getString("database.url");
-        dbUsername = appConfig.getString("database.username");
-        dbPassword = appConfig.getString("database.password");
+        try {
+            XMLConfiguration c = new XMLConfiguration(app.getConfig("database.properties"));
+            c.configurationsAt("databases.database").stream().forEach((t) -> {
+                infos.put(t.getString("jndiName"), new DBInfo(
+                        t.getString("jndiName"),
+                        t.getString("url"),
+                        t.getString("username"),
+                        t.getString("password"),
+                        t.getString("dsProvider")
+                ));
+            });
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        jndiName = appConfig.getString("database.jndiName");
-        dsProvider = appConfig.getString("database.dsProvider");
-
-        // publish JNDI name
+        try {
+            getDataSource("jdbc/sample").getConnection();
+        } catch (SQLException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    /**
-     * @return the dbUrl
-     */
-    public String getDbUrl() {
-        return dbUrl;
-    }
+    public Connection getConnection(String jndiName) throws SQLException {
+        DBInfo i = infos.get(jndiName);
+        if (i == null) {
+            return null;
+        }
 
-    /**
-     * @return the dbUsername
-     */
-    public String getDbUsername() {
-        return dbUsername;
-    }
-
-    /**
-     * @return the dbPassword
-     */
-    public String getDbPassword() {
-        return dbPassword;
-    }
-
-    public Connection getConnection() throws SQLException {
         Connection conn = null;
         Properties connectionProps = new Properties();
-        connectionProps.put("user", dbUsername);
-        connectionProps.put("password", dbPassword);
+        connectionProps.put("user", i.dbUsername);
+        connectionProps.put("password", i.dbPassword);
 
-        conn = DriverManager.getConnection(dbUrl, connectionProps);
+        conn = DriverManager.getConnection(i.dbUrl, connectionProps);
 
         System.out.println("Connected to database");
         return conn;
     }
 
-    public DataSource getDataSource() {
-        try {
-            if (ds == null) {
-                ds = (BasicDataSource) Class.forName(dsProvider).newInstance();
-                ds.setUrl(dbUrl);
-                ds.setUsername(dbUsername);
-                ds.setPassword(dbPassword);
-            }
-
-            return ds;
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+    public DataSource getDataSource(String jndiName) {
+        DBInfo i = infos.get(jndiName);
+        if (i == null) {
             return null;
+        }
+
+        DataSource ds = dss.get(jndiName);
+        if (ds == null) {
+            BasicDataSource t = new BasicDataSource();
+            t.setDriverClassName(i.dsProvider);
+            t.setUrl(i.dbUrl);
+            if(!i.dbUsername.isEmpty()) t.setUsername(i.dbUsername);
+            if(!i.dbPassword.isEmpty()) t.setPassword(i.dbPassword);
+
+//            try {
+//                Hashtable env = new Hashtable();
+//                env.put(Context.INITIAL_CONTEXT_FACTORY,
+//                        "com.sun.jndi.fscontext.RefFSContextFactory");
+//                Context ic = new InitialContext(env);
+//                ic.bind(jndiName, t);
+//            } catch (NamingException ex) {
+//                Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+
+            ds = t;
+            dss.put(jndiName, ds);
+        }
+
+        return ds;
+    }
+
+    private class DBInfo {
+
+        public String jndiName;
+        public String dbUrl;
+        public String dbUsername;
+        public String dbPassword;
+        public String dsProvider;
+
+        public DBInfo(String jndiName, String dbUrl, String dbUsername, String dbPassword, String dsProvider) {
+            this.jndiName = jndiName;
+            this.dbUrl = dbUrl;
+            this.dbUsername = dbUsername;
+            this.dbPassword = dbPassword;
+            this.dsProvider = dsProvider;
         }
     }
 }
