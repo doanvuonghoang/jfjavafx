@@ -48,7 +48,7 @@ public class Application extends javafx.application.Application {
     /**
      * JF_HOME
      */
-    protected static String JF_HOME;
+    public static String JF_HOME;
     /**
      * config path
      */
@@ -61,6 +61,7 @@ public class Application extends javafx.application.Application {
      * resources path
      */
     protected static String JF_RESOURCES;
+    
     /**
      * config
      */
@@ -71,6 +72,8 @@ public class Application extends javafx.application.Application {
     private final Dictionary<Class, Service> services = new Hashtable();
 
     private Stage pStage;
+    
+    private static Application sapp = null;
 
     /**
      * Start the application
@@ -80,6 +83,7 @@ public class Application extends javafx.application.Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Application.sapp = this;
         this.pStage = primaryStage;
         
         // set env variables
@@ -216,6 +220,10 @@ public class Application extends javafx.application.Application {
         }
 
         return (T) s;
+    }
+    
+    public static <T extends Service> T _getService(Class<T> n) {
+        return Application.sapp.getService(n);
     }
 
     /**

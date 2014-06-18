@@ -16,6 +16,9 @@
  */
 package com.jf.javafx.services;
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.jdbc.DataSourceConnectionSource;
 import com.jf.javafx.AbstractService;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,9 +28,6 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -121,6 +121,29 @@ public class Database extends AbstractService {
         }
 
         return ds;
+    }
+    
+    public DataSource getAppDataSource() {
+        return getDataSource(appConfig.getString("datasource"));
+    }
+    
+    public String getAppDBUrl() {
+        return infos.get(appConfig.getString("datasource")).dbUrl;
+    }
+    
+    public <U, V> Dao<U, V> createAppDao(Class<U> cls) {
+        DataSource ds = getAppDataSource();
+        String url = getAppDBUrl();
+        
+        try { 
+            Dao<U, V> dao = DaoManager.createDao(new DataSourceConnectionSource(ds, url), cls);
+            
+            return dao;
+        } catch (SQLException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+            
+            return null;
+        }
     }
 
     private class DBInfo {
