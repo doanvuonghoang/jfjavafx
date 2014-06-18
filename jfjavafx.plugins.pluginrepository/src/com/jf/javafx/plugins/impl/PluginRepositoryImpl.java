@@ -15,14 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.pluginmanager.impl;
+package com.jf.javafx.plugins.impl;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.jdbc.DataSourceConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.jf.javafx.Application;
-import com.jf.javafx.pluginmanager.PluginManager;
+import com.jf.javafx.plugins.PluginRepository;
 import com.jf.javafx.services.Database;
+import com.jf.javafx.services.Security;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -33,6 +34,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
 import net.xeoh.plugins.base.annotations.meta.Author;
 import net.xeoh.plugins.base.annotations.meta.Version;
+import org.apache.shiro.authz.AuthorizationException;
 
 /**
  *
@@ -41,13 +43,13 @@ import net.xeoh.plugins.base.annotations.meta.Version;
 @PluginImplementation
 @Author(name = "Hoang Doan")
 @Version(version = 1000)
-public class PluginManagerImpl implements PluginManager {
+public class PluginRepositoryImpl implements PluginRepository {
     
-    private Dao<com.jf.javafx.pluginmanager.impl.datamodels.Plugin, Long> dao;
+    private Dao<com.jf.javafx.plugins.impl.datamodels.Plugin, Long> dao;
     
     @Init
     public void init() {
-        dao = Application._getService(Database.class).createAppDao(com.jf.javafx.pluginmanager.impl.datamodels.Plugin.class);
+        dao = Application._getService(Database.class).createAppDao(com.jf.javafx.plugins.impl.datamodels.Plugin.class);
         
         if(!isInstalled(this.getClass().getName())) install(this.getClass().getName());
     }
@@ -56,10 +58,10 @@ public class PluginManagerImpl implements PluginManager {
     public boolean isInstalled(String pluginName) {
         if(dao != null) {
             try {
-                return !dao.queryForEq(com.jf.javafx.pluginmanager.impl.datamodels.Plugin.FIELD_PLUGIN_CLASS_NAME, 
+                return !dao.queryForEq(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_PLUGIN_CLASS_NAME, 
                         pluginName).isEmpty();
             } catch (SQLException ex) {
-                Logger.getLogger(PluginManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
@@ -68,13 +70,18 @@ public class PluginManagerImpl implements PluginManager {
 
     @Override
     public void install(Plugin p) {
+        if(!Application._getService(Security.class).isPermitted("plugin:install"))
+            throw new AuthorizationException("dont have permission to install plugin");
+        
+        if(isInstalled(p.getClass().getName())) return;
+        
         try {
             p.getClass().getMethod("installPlugin").invoke(p);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(PluginManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        com.jf.javafx.pluginmanager.impl.datamodels.Plugin model = new com.jf.javafx.pluginmanager.impl.datamodels.Plugin();
+        com.jf.javafx.plugins.impl.datamodels.Plugin model = new com.jf.javafx.plugins.impl.datamodels.Plugin();
         model.pluginClassName = p.getClass().getName();
         model.author = p.getClass().getAnnotation(Author.class).name();
         model.version = p.getClass().getAnnotation(Version.class).version();
@@ -84,7 +91,7 @@ public class PluginManagerImpl implements PluginManager {
         if(dao != null) try {
             dao.create(model);
         } catch (SQLException ex) {
-            Logger.getLogger(PluginManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -94,7 +101,7 @@ public class PluginManagerImpl implements PluginManager {
             Plugin ist = p.newInstance();
             install(ist);
         } catch (IllegalAccessException | InstantiationException ex) {
-            Logger.getLogger(PluginManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -103,18 +110,26 @@ public class PluginManagerImpl implements PluginManager {
         try {
             install((Class<Plugin>) Class.forName(pluginClassName));
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(PluginManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     @Override
     public void uninstall(String pluginClassName) {
+        if(!Application._getService(Security.class).isPermitted("plugin:install"))
+            throw new AuthorizationException("dont have permission to uninstall plugin");
+        
+        try {
+            dao.deleteBuilder().where().eq(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_PLUGIN_CLASS_NAME, pluginClassName).query();
+        } catch (SQLException ex) {
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void installPlugin() throws SQLException {
         TableUtils.createTable(new DataSourceConnectionSource(
                 Application._getService(Database.class).getAppDataSource(),
                 Application._getService(Database.class).getAppDBUrl()), 
-                com.jf.javafx.pluginmanager.impl.datamodels.Plugin.class);
+                com.jf.javafx.plugins.impl.datamodels.Plugin.class);
     }
 }

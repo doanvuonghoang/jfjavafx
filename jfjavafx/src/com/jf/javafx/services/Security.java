@@ -71,4 +71,12 @@ public class Security extends AbstractService {
     public void logout() {
         SecurityUtils.getSubject().logout();
     }
+    
+    public boolean isPermitted(String str) {
+        return SecurityUtils.getSubject().isPermitted(str);
+    }
+    
+    public boolean hasRole(String str) {
+        return SecurityUtils.getSubject().hasRole(str);
+    }
 }

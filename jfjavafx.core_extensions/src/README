@@ -1,9 +1,0 @@
-scene
-page
-
-extensions:
-	- XML define: 
-		+ name, description, author, ..., version
-		+ page defs
-		+ dependencies: other extensions
-	- bin files

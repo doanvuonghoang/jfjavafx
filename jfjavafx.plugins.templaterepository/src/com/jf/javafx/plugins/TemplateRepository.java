@@ -15,22 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.pluginmanager;
+package com.jf.javafx.plugins;
 
+import java.net.URI;
 import net.xeoh.plugins.base.Plugin;
 
 /**
  *
  * @author Hoàng Doãn
  */
-public interface PluginManager extends Plugin {
-    public boolean isInstalled(String pluginName);
+public interface TemplateRepository extends Plugin {
+    public boolean isExisted(String path);
     
-    public void install(Plugin p);
-    
-    public void install(Class<Plugin> p);
-    
-    public void install(String pluginClassName);
-    
-    public void uninstall(String pluginClassName);
+    public void install(URI templateURI, String toPath);
 }
