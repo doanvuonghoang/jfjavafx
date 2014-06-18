@@ -27,11 +27,19 @@ import java.util.Date;
  */
 @DatabaseTable(tableName = "Plugins")
 public class Plugin {
-    @DatabaseField(id = true, generatedId = true, allowGeneratedIdInsert = true, generatedIdSequence = "1")
+    public static final String FIELD_PLUGIN_CLASS_NAME = "pluginClassName";
+    
+    @DatabaseField(generatedId = true)
     public long id;
     
-    @DatabaseField(unique = true, canBeNull = false)
+    @DatabaseField(unique = true, canBeNull = false, columnName = FIELD_PLUGIN_CLASS_NAME)
     public String pluginClassName;
+    
+    @DatabaseField
+    public String author;
+    
+    @DatabaseField
+    public int version;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
@@ -42,6 +50,6 @@ public class Plugin {
     @DatabaseField
     public Date lastModifiedTime;
     
-    @DatabaseField(foreign = true)
+    @DatabaseField
     public String lastModifier;
 }

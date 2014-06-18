@@ -19,7 +19,6 @@ package com.jf.javafx.pluginmanager.impl;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.jdbc.DataSourceConnectionSource;
-import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.jf.javafx.Application;
 import com.jf.javafx.pluginmanager.PluginManager;
@@ -32,28 +31,33 @@ import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
+import net.xeoh.plugins.base.annotations.meta.Author;
+import net.xeoh.plugins.base.annotations.meta.Version;
 
 /**
  *
  * @author Hoàng Doãn
  */
 @PluginImplementation
+@Author(name = "Hoang Doan")
+@Version(version = 1000)
 public class PluginManagerImpl implements PluginManager {
     
     private Dao<com.jf.javafx.pluginmanager.impl.datamodels.Plugin, Long> dao;
     
     @Init
     public void init() {
-        if(!isInstalled(this.getClass().getName())) install(this.getClass().getName());
-        
         dao = Application._getService(Database.class).createAppDao(com.jf.javafx.pluginmanager.impl.datamodels.Plugin.class);
+        
+        if(!isInstalled(this.getClass().getName())) install(this.getClass().getName());
     }
 
     @Override
     public boolean isInstalled(String pluginName) {
         if(dao != null) {
             try {
-                return !dao.queryForEq("pluginClassName", pluginName).isEmpty();
+                return !dao.queryForEq(com.jf.javafx.pluginmanager.impl.datamodels.Plugin.FIELD_PLUGIN_CLASS_NAME, 
+                        pluginName).isEmpty();
             } catch (SQLException ex) {
                 Logger.getLogger(PluginManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -72,6 +76,8 @@ public class PluginManagerImpl implements PluginManager {
         
         com.jf.javafx.pluginmanager.impl.datamodels.Plugin model = new com.jf.javafx.pluginmanager.impl.datamodels.Plugin();
         model.pluginClassName = p.getClass().getName();
+        model.author = p.getClass().getAnnotation(Author.class).name();
+        model.version = p.getClass().getAnnotation(Version.class).version();
         model.creator = this.getClass().getName();
         model.createdTime = Calendar.getInstance().getTime();
         
@@ -106,6 +112,9 @@ public class PluginManagerImpl implements PluginManager {
     }
     
     public void installPlugin() throws SQLException {
-        TableUtils.createTableIfNotExists(new JdbcConnectionSource(Application._getService(Database.class).getAppDBUrl()), com.jf.javafx.pluginmanager.impl.datamodels.Plugin.class);
+        TableUtils.createTable(new DataSourceConnectionSource(
+                Application._getService(Database.class).getAppDataSource(),
+                Application._getService(Database.class).getAppDBUrl()), 
+                com.jf.javafx.pluginmanager.impl.datamodels.Plugin.class);
     }
 }
