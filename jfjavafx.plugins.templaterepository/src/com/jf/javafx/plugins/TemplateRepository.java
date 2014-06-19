@@ -28,4 +28,6 @@ public interface TemplateRepository extends Plugin {
     public boolean isExisted(String path);
     
     public void install(URI templateURI, String toPath);
+    
+    public void uninstall(String path);
 }

@@ -79,4 +79,8 @@ public class Security extends AbstractService {
     public boolean hasRole(String str) {
         return SecurityUtils.getSubject().hasRole(str);
     }
+    
+    public String getUserName() {
+        return SecurityUtils.getSubject().toString();
+    }
 }

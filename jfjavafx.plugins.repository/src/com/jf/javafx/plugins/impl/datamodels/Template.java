@@ -25,21 +25,16 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Plugins")
-public class Plugin {
-    public static final String FIELD_PLUGIN_CLASS_NAME = "pluginClassName";
-    
+@DatabaseTable(tableName = "Templates")
+public class Template {
     @DatabaseField(generatedId = true)
     public long id;
     
-    @DatabaseField(unique = true, canBeNull = false, columnName = FIELD_PLUGIN_CLASS_NAME)
-    public String pluginClassName;
+    @DatabaseField(foreign = true)
+    public Plugin plugin;
     
-    @DatabaseField
-    public String author;
-    
-    @DatabaseField
-    public int version;
+    @DatabaseField(canBeNull = false)
+    public String sourceURI;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;

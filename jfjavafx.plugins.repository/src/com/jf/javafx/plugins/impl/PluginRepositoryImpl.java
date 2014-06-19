@@ -88,6 +88,8 @@ public class PluginRepositoryImpl implements PluginRepository {
         model.creator = this.getClass().getName();
         model.createdTime = Calendar.getInstance().getTime();
         
+        
+        
         if(dao != null) try {
             dao.create(model);
         } catch (SQLException ex) {
