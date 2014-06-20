@@ -42,6 +42,9 @@ public class Plugin {
     
     @DatabaseField
     public int version;
+
+    @DatabaseField
+    public String resourcesInString;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
@@ -56,5 +59,5 @@ public class Plugin {
     public String lastModifier;
     
     @ForeignCollectionField
-    public ForeignCollection<Template> templates;
+    public ForeignCollection<Resource> resources;
 }

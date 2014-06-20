@@ -54,8 +54,4 @@ public class UI extends AbstractService {
     public void setContent(Node n) {
         mc.setContent(n);
     }
-    
-    public File getTemplateFile(String path) {
-        return app.getTemplateFile(path);
-    }
 }

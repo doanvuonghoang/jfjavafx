@@ -15,19 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.plugins;
+package com.jf.javafx.services;
 
-import java.net.URI;
-import net.xeoh.plugins.base.Plugin;
+import com.jf.javafx.AbstractService;
+import java.io.File;
 
 /**
  *
  * @author Hoàng Doãn
  */
-public interface TemplateRepository extends Plugin {
-    public boolean isExisted(String path);
+public class Resource extends AbstractService {
+   
+    @Override
+    protected void _initService() {
+    }
+
+    /**
+     * Get template file.
+     * @param path
+     * @return 
+     */
+    public File getTemplateFile(String path) {
+        return app.getTemplateFile(path);
+    }
     
-    public void install(URI templateURI, String toPath);
-    
-    public void uninstall(String path);
+    /**
+     * Get resource file.
+     * @param path
+     * @return 
+     */
+    public File getResourceFile(String path) {
+        return app.getResource(path);
+    }
 }

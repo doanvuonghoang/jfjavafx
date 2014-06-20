@@ -36,7 +36,7 @@ public class Resource {
     @DatabaseField(canBeNull = false)
     public String sourceURI;
     
-    @DatabaseField
+    @DatabaseField(canBeNull = false, defaultValue = "GENERAL")
     public ResourceType resourceType;
     
     @DatabaseField(canBeNull = false, defaultValue = "false")
@@ -44,6 +44,9 @@ public class Resource {
     
     @DatabaseField
     public String deployPath;
+    
+    @DatabaseField(canBeNull = false, defaultValue = "C")
+    public char action;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
@@ -60,7 +63,6 @@ public class Resource {
     public enum ResourceType {
         TEMPLATE,
         BUNDLE,
-        CONFIG,
         GENERAL
     }
 }
