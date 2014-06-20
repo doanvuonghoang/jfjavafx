@@ -18,10 +18,13 @@ package com.jf.javafx.services;
 
 import com.jf.javafx.AbstractService;
 import com.jf.javafx.Application;
+import com.jf.javafx.plugins.impl.PluginRepositoryImpl;
+import com.jf.javafx.plugins.impl.ResourceRepositoryImpl;
 import java.io.File;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
+import net.xeoh.plugins.base.util.uri.ClassURI;
 
 /**
  *
@@ -33,6 +36,8 @@ public class Plugins extends AbstractService {
     @Override
     protected void _initService() {
         pm = PluginManagerFactory.createPluginManager();
+        pm.addPluginsFrom(new ClassURI(PluginRepositoryImpl.class).toURI());
+        pm.addPluginsFrom(new ClassURI(ResourceRepositoryImpl.class).toURI());
         pm.addPluginsFrom((new File(getPluginsPath())).toURI());
     }
     

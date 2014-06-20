@@ -20,13 +20,13 @@ package com.jf.javafx.services;
 import com.jf.javafx.AbstractService;
 import com.jf.javafx.Pair;
 import com.jf.javafx.controllers.MasterController;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
 
 /**
  *
@@ -51,7 +51,27 @@ public class UI extends AbstractService {
         app.getStage().setScene(s);
     }
 
+    /**
+     * Set content of screen
+     * @param n 
+     */
     public void setContent(Node n) {
         mc.setContent(n);
+    }
+    
+    /**
+     * set logo 
+     * @param rsPath 
+     */
+    public void setLogo(String rsPath) {
+        mc.setLogo(rsPath);
+    }
+    
+    /**
+     * add menu
+     * @param m 
+     */
+    public void addMenu(Menu m) {
+        mc.addMenu(m);
     }
 }

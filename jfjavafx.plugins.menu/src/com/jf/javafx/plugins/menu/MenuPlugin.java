@@ -24,5 +24,5 @@ import net.xeoh.plugins.base.Plugin;
  * @author Hoàng Doãn
  */
 public interface MenuPlugin extends Plugin {
-    public void sayHello();
+    public void render();
 }

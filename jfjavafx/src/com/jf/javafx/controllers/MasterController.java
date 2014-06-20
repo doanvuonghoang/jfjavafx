@@ -33,6 +33,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
@@ -174,17 +175,39 @@ public class MasterController extends Controller {
                 )).build().play();
     }
     
+    /**
+     * Set main content of scene
+     * @param n 
+     */
     public void setContent(Node n) {
-//        contentPane.getChildren().clear();
-//        contentPane.getChildren().add(n);
         contentPane.setCenter(n);
     }
     
+    /**
+     * Set logo of application
+     * @param path resource path
+     */
     public void setLogo(String path) {
         try {
             imgLogo.setImage(new Image(app.getResource(path).toURL().openStream()));
         } catch (IOException ex) {
             Logger.getLogger(MasterController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * get menu bar of application
+     * @return 
+     */
+    public MenuBar getMenuBar() {
+        return menuBar;
+    }
+    
+    /**
+     * Add a menu to bar
+     * @param m 
+     */
+    public void addMenu(Menu m) {
+        menuBar.getMenus().add(m);
     }
 }
