@@ -15,16 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.plugins.menu;
+package com.jf.javafx.services;
 
-import net.xeoh.plugins.base.Plugin;
+import com.jf.javafx.AbstractService;
+import com.jf.javafx.Application;
+import com.jf.javafx.plugins.PluginRepository;
 
 /**
  *
  * @author Hoàng Doãn
  */
-public interface MenuPlugin extends Plugin {
-    public void render();
+public class Starter extends AbstractService {
     
-    public void test();
+    @Override
+    protected void _initService() {
+//        try {
+//            Application._getService(Plugins.class).getPlugin((Class<Plugin>) Class.forName("com.jf.javafx.plugins.menu.MenuPlugin"));
+            Application._getService(Plugins.class).getPlugin(PluginRepository.class);
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(Starter.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    }
+
 }

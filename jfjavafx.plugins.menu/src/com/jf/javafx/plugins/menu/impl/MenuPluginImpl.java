@@ -40,11 +40,12 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.image.ImageView;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.Timer;
 import net.xeoh.plugins.base.annotations.events.Init;
+import net.xeoh.plugins.base.annotations.events.PluginLoaded;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import net.xeoh.plugins.base.annotations.meta.Author;
 import net.xeoh.plugins.base.annotations.meta.Version;
-import net.xeoh.plugins.base.impl.registry.PluginRegistry;
 
 /**
  *
@@ -67,13 +68,19 @@ public class MenuPluginImpl implements MenuPlugin {
                 Application._getService(Database.class).getAppDBUrl()),
                 Menu.class);
     }
-
-    @Init
+    
+    @PluginLoaded
     public void init() {
         if(!pr.isInstalled(this.getClass().getName())) pr.install(this);
         
         render();
     }
+
+    @Timer(period = 1000)
+    @Override
+    public void test() {
+        System.out.println(MenuPlugin.class.getName());
+    }    
 
     @Override
     public void render() {
