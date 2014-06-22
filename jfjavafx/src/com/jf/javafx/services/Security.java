@@ -73,7 +73,13 @@ public class Security extends AbstractService {
     }
     
     public boolean isPermitted(String str) {
+        if(!appConfig.getBoolean("authentication.required", true)) return true;
         return SecurityUtils.getSubject().isPermitted(str);
+    }
+    
+    public void checkPermission(String str) {
+        if(appConfig.getBoolean("authentication.required", true))
+            SecurityUtils.getSubject().checkPermission(str);
     }
     
     public boolean hasRole(String str) {

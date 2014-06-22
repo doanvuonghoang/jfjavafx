@@ -25,9 +25,12 @@ import com.jf.javafx.plugins.PluginRepository;
 import com.jf.javafx.plugins.menu.MenuPlugin;
 import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
 import com.jf.javafx.services.Database;
+import com.jf.javafx.services.Resource;
 import com.jf.javafx.services.Router;
 import com.jf.javafx.services.UI;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,11 +41,10 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.ImageView;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.Timer;
 import net.xeoh.plugins.base.annotations.events.Init;
-import net.xeoh.plugins.base.annotations.events.PluginLoaded;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import net.xeoh.plugins.base.annotations.meta.Author;
 import net.xeoh.plugins.base.annotations.meta.Version;
@@ -67,25 +69,27 @@ public class MenuPluginImpl implements MenuPlugin {
                 Application._getService(Database.class).getAppDataSource(),
                 Application._getService(Database.class).getAppDBUrl()),
                 Menu.class);
+        
+        Menu m = new Menu();
+        m.text = "_Start";
+        m.creator = "SYS";
+        m.createdTime = Calendar.getInstance().getTime();
+        m.icon = "start.png";
+        
+        dao.create(m);
     }
     
-    @PluginLoaded
+    @Init
     public void init() {
         if(!pr.isInstalled(this.getClass().getName())) pr.install(this);
         
         render();
     }
 
-    @Timer(period = 1000)
-    @Override
-    public void test() {
-        System.out.println(MenuPlugin.class.getName());
-    }    
-
     @Override
     public void render() {
         try {
-            List<Menu> list = dao.queryForAll();
+            List<Menu> list = getAvailableList();
             list.stream().filter((m) -> (m.parent == null)).map((m) -> {
                 javafx.scene.control.Menu mui = new javafx.scene.control.Menu(m.text);
                 mui.setMnemonicParsing(true);
@@ -105,6 +109,10 @@ public class MenuPluginImpl implements MenuPlugin {
             Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    private List<Menu> getAvailableList() throws SQLException {
+        return dao.queryForAll();
+    }
 
     private void renderMenu(javafx.scene.control.Menu mui, long id, List<Menu> list) {
         list.stream().filter((m) -> (m.parent.id == id)).map((Menu m) -> {
@@ -112,6 +120,8 @@ public class MenuPluginImpl implements MenuPlugin {
 
             if (m.hasChilren) {
                 mi = new javafx.scene.control.Menu(m.text);
+            } else if(m.text == "-") {
+                mi = new SeparatorMenuItem();
             } else if (m.menuType == Menu.MenuType.BUTTON) {
                 Button btn = new Button(m.text);
                 mi = new CustomMenuItem(btn);
@@ -158,7 +168,11 @@ public class MenuPluginImpl implements MenuPlugin {
 
     private void bindGraphic(Menu m, MenuItem mi) {
         if (m.icon != null) {
-            mi.setGraphic(new ImageView(m.icon));
+            try {
+                mi.setGraphic(new ImageView(Application._getService(Resource.class).getResourceFile(m.icon).toURL().toString()));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

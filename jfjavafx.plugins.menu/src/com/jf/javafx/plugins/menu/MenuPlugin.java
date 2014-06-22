@@ -25,6 +25,4 @@ import net.xeoh.plugins.base.Plugin;
  */
 public interface MenuPlugin extends Plugin {
     public void render();
-    
-    public void test();
 }
