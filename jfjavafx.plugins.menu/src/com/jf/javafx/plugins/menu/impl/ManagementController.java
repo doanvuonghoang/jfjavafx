@@ -15,40 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.services;
+package com.jf.javafx.plugins.menu.impl;
 
-import com.jf.javafx.AbstractService;
-import java.io.File;
+import java.net.URL;
+import java.util.ResourceBundle;
+import com.jf.javafx.Controller;
 
 /**
+ * FXML Controller class
  *
  * @author Hoàng Doãn
  */
-public class Resource extends AbstractService {
-   
-    @Override
-    protected void _initService() {
-    }
+public class ManagementController extends Controller {
 
     /**
-     * Get template file.
-     * @param path
-     * @return 
+     * Initializes the controller class.
      */
-    public File getTemplateFile(String path) {
-        return app.getTemplateFile(path);
-    }
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        
+    }    
     
-    /**
-     * Get resource file.
-     * @param path
-     * @return 
-     */
-    public File getResourceFile(String path) {
-        return app.getResource(path);
-    }
-    
-    public File getBundleFile(String path) {
-        return app.getResource("controllers/" + path);
-    }
 }

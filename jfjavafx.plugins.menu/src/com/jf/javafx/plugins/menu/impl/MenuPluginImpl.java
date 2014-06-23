@@ -75,8 +75,20 @@ public class MenuPluginImpl implements MenuPlugin {
         m.creator = "SYS";
         m.createdTime = Calendar.getInstance().getTime();
         m.icon = "start.png";
+        m.hasChilren = true;
         
         dao.create(m);
+        
+        Menu sub = new Menu();
+        sub.text = "Setup";
+        sub.parent = m;
+        sub.creator = "SYS";
+        sub.createdTime = m.createdTime;
+        sub.icon = "start.png";
+        sub.actionType = Menu.ActionType.TEMPLATE;
+        sub.actionSource = "menuManagement/Management";
+        
+        dao.create(sub);
     }
     
     @Init
@@ -115,7 +127,7 @@ public class MenuPluginImpl implements MenuPlugin {
     }
 
     private void renderMenu(javafx.scene.control.Menu mui, long id, List<Menu> list) {
-        list.stream().filter((m) -> (m.parent.id == id)).map((Menu m) -> {
+        list.stream().filter((m) -> (m.parent != null && m.parent.id == id)).map((Menu m) -> {
             MenuItem mi;
 
             if (m.hasChilren) {

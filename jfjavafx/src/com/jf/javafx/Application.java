@@ -258,7 +258,7 @@ public class Application extends javafx.application.Application {
      * @return
      */
     public File getTemplateFile(String path) {
-        return new File(JF_TEMPLATES + File.separator + path + ".fxml");
+        return new File(JF_TEMPLATES + File.separator + path);
     }
 
     /**
@@ -269,7 +269,7 @@ public class Application extends javafx.application.Application {
      */
     public Pair<Node, ?> createNode(String path) {
         final Application app = this;
-        File fxml = getTemplateFile(path);
+        File fxml = getTemplateFile(path + ".fxml");
         Node node;
         Object controller = null;
         try {

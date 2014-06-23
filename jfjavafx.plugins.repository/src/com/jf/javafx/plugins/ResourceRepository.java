@@ -17,7 +17,7 @@ public interface ResourceRepository extends Plugin {
     
     public void upload(Resource r) throws ResourceException;
     
-    public void deploy(Resource r, String toPath) throws ResourceException;
+    public void deploy(Resource r, String toPath, Plugin p) throws Exception;
     
     public void undeploy(Resource r) throws ResourceException;
 }

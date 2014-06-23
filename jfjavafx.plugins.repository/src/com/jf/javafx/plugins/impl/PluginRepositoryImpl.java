@@ -25,12 +25,10 @@ import com.jf.javafx.plugins.PluginRepository;
 import com.jf.javafx.plugins.ResourceRepository;
 import com.jf.javafx.plugins.impl.datamodels.Resource;
 import com.jf.javafx.services.Database;
-import com.jf.javafx.services.Plugins;
 import com.jf.javafx.services.Security;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.List;
@@ -136,12 +134,17 @@ public class PluginRepositoryImpl implements PluginRepository {
                         r.plugin = model;
                         r.sourceURI = c.getString("[@src]");
                         r.resourceType = Resource.ResourceType.valueOf(c.getString("[@type]"));
+                        r.deployPath = c.getString("[@deployPath]");
                         r.creator = model.creator;
                         r.createdTime = model.createdTime;
                         
                         try {
                             rr.upload(r);
-                        } catch (ResourceException ex) {
+                            
+                            if(cfg.getBoolean("autoDeploy", false)) {
+                                rr.deploy(r, r.deployPath, p);
+                            }
+                        } catch (Exception ex) {
                             Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }

@@ -44,12 +44,14 @@ public class Plugins extends AbstractService {
         return Application.JF_HOME + File.separator + "plugins";
     }
     
-    public String getRelativePath(Plugin p, String path) {
-        return "plugin:" + p.getClass().getName() + ":" + path;
-    }
-    
-    public String getAbsolutePath(String pName, String path) throws ClassNotFoundException {
-        return Class.forName(pName).getResource(path).toString();
+    public String getAbsolutePath(Plugin p, String path) throws ClassNotFoundException {
+        java.net.URL url = p.getClass().getResource(path);
+        
+        System.out.println(path + ":" + url);
+        
+        if(url == null) return null;
+        
+        return url.toString();
     }
 
     /**
