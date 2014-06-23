@@ -91,10 +91,6 @@ public class PluginRepositoryImpl implements PluginRepository {
     public void install(Plugin p) {
         Application._getService(Security.class).checkPermission("plugin:install");
 
-        if (isInstalled(p.getClass().getName())) {
-            return;
-        }
-
         try {
             p.getClass().getMethod("installPlugin").invoke(p);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -142,7 +138,7 @@ public class PluginRepositoryImpl implements PluginRepository {
                             rr.upload(r);
                             
                             if(cfg.getBoolean("autoDeploy", false)) {
-                                rr.deploy(r, r.deployPath, p);
+                                rr.deploy(r, r.deployPath);
                             }
                         } catch (Exception ex) {
                             Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);

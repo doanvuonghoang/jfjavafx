@@ -87,7 +87,7 @@ public class ResourceRepositoryImpl implements ResourceRepository {
     }
 
     @Override
-    public void deploy(Resource r, String toPath, Plugin p) throws Exception {
+    public void deploy(Resource r, String toPath) throws Exception {
         if (!r.isDeployed) {
             File dest;
 
@@ -106,14 +106,14 @@ public class ResourceRepositoryImpl implements ResourceRepository {
                 Files.createFile(dest.toPath());
             }
 
-            if (p == null) {
+            if (r.plugin == null) {
                 Files.copy((new URI(r.sourceURI)).toURL().openStream(),
                         Paths.get(dest.toURI()),
                         StandardCopyOption.REPLACE_EXISTING
                 );
             } else {
                 Files.copy((new URI(Application._getService(Plugins.class).
-                        getAbsolutePath(p, r.sourceURI))).toURL().openStream(),
+                        getAbsolutePath(r.plugin.pluginClassName, r.sourceURI))).toURL().openStream(),
                         dest.toPath(),
                         StandardCopyOption.REPLACE_EXISTING
                 );
