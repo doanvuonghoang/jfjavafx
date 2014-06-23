@@ -26,17 +26,14 @@ import com.jf.javafx.services.Database;
 import com.jf.javafx.services.Plugins;
 import java.io.File;
 import java.net.URI;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
-import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
 import net.xeoh.plugins.base.annotations.meta.Author;
 import net.xeoh.plugins.base.annotations.meta.Version;
-import org.apache.commons.configuration.FileSystem;
 
 /**
  *
@@ -100,7 +97,7 @@ public class ResourceRepositoryImpl implements ResourceRepository {
             }
 
             if (dest.exists()) {
-                throw new ResourceException("Can not deploy to existing resource: " + toPath);
+//                throw new ResourceException("Can not deploy to existing resource: " + toPath);
             } else {
                 if(!dest.getParentFile().exists()) dest.getParentFile().mkdirs();
                 Files.createFile(dest.toPath());

@@ -18,12 +18,10 @@
 package com.jf.javafx.plugins.menu.impl.datamodels;
 
 import com.j256.ormlite.dao.ForeignCollection;
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -81,5 +79,15 @@ public class Menu {
         BUTTON,
         TEXT,
         DEFAULT
+    }
+    
+    public String toString() {
+        return text;
+    }
+    
+    public boolean equals(Object obj) {
+        if(obj instanceof Menu) {
+            return id == ((Menu) obj).id;
+        } else return super.equals(obj);
     }
 }

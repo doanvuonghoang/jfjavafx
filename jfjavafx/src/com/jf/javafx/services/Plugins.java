@@ -73,6 +73,8 @@ public class Plugins extends AbstractService {
     public String getAbsolutePath(String pluginClassName, String path) throws ClassNotFoundException {
         java.net.URL url = Class.forName(pluginClassName, false, this.getClass().getClassLoader()).getResource(path);
 
+        System.out.println(url.toString());
+        
         if (url == null) {
             return null;
         }

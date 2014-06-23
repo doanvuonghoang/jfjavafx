@@ -75,7 +75,7 @@ public class MenuPluginImpl implements MenuPlugin {
         m.text = "_Start";
         m.creator = "SYS";
         m.createdTime = Calendar.getInstance().getTime();
-        m.icon = "start.png";
+//        m.icon = "start.png";
         m.hasChilren = true;
         
         dao.create(m);
@@ -102,7 +102,7 @@ public class MenuPluginImpl implements MenuPlugin {
     @Override
     public void render() {
         try {
-            List<Menu> list = getAvailableList();
+            List<Menu> list = getAvailableMenues();
             list.stream().filter((m) -> (m.parent == null)).map((m) -> {
                 javafx.scene.control.Menu mui = new javafx.scene.control.Menu(m.text);
                 mui.setMnemonicParsing(true);
@@ -123,7 +123,8 @@ public class MenuPluginImpl implements MenuPlugin {
         }
     }
     
-    private List<Menu> getAvailableList() throws SQLException {
+    @Override
+    public List<Menu> getAvailableMenues() throws SQLException {
         return dao.queryForAll();
     }
 
