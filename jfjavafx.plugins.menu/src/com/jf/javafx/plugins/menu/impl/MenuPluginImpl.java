@@ -72,22 +72,22 @@ public class MenuPluginImpl implements MenuPlugin {
                 Menu.class);
         
         Menu m = new Menu();
-        m.text = "_Start";
-        m.creator = "SYS";
-        m.createdTime = Calendar.getInstance().getTime();
+        m.setText("_Start");
+        m.setCreator("SYS");
+        m.setCreatedTime(Calendar.getInstance().getTime());
 //        m.icon = "start.png";
-        m.hasChilren = true;
+        m.setHasChilren(true);
         
         dao.create(m);
         
         Menu sub = new Menu();
-        sub.text = "Setup";
-        sub.parent = m;
-        sub.creator = "SYS";
-        sub.createdTime = m.createdTime;
-        sub.icon = "start.png";
-        sub.actionType = Menu.ActionType.TEMPLATE;
-        sub.actionSource = "menuManagement/Management";
+        sub.setText("Setup");
+        sub.setParent(m);
+        sub.setCreator("SYS");
+        sub.setCreatedTime(m.getCreatedTime());
+        sub.setIcon("start.png");
+        sub.setActionType(Menu.ActionType.TEMPLATE);
+        sub.setActionSource("menuManagement/Management");
         
         dao.create(sub);
     }
@@ -103,13 +103,13 @@ public class MenuPluginImpl implements MenuPlugin {
     public void render() {
         try {
             List<Menu> list = getAvailableMenues();
-            list.stream().filter((m) -> (m.parent == null)).map((m) -> {
-                javafx.scene.control.Menu mui = new javafx.scene.control.Menu(m.text);
+            list.stream().filter((m) -> (m.getParent() == null)).map((m) -> {
+                javafx.scene.control.Menu mui = new javafx.scene.control.Menu(m.getText());
                 mui.setMnemonicParsing(true);
                 bindGraphic(m, mui);
 
-                if (m.hasChilren) {
-                    renderMenu(mui, m.id, list);
+                if (m.getHasChilren()) {
+                    renderMenu(mui, m.getId(), list);
                 } else {
                     bindAction(m, mui);
                 }
@@ -129,22 +129,22 @@ public class MenuPluginImpl implements MenuPlugin {
     }
 
     private void renderMenu(javafx.scene.control.Menu mui, long id, List<Menu> list) {
-        list.stream().filter((m) -> (m.parent != null && m.parent.id == id)).map((Menu m) -> {
+        list.stream().filter((m) -> (m.getParent() != null && m.getParent().getId() == id)).map((Menu m) -> {
             MenuItem mi;
 
-            if (m.hasChilren) {
-                mi = new javafx.scene.control.Menu(m.text);
-            } else if(m.text == "-") {
+            if (m.getHasChilren()) {
+                mi = new javafx.scene.control.Menu(m.getText());
+            } else if(m.getText() == "-") {
                 mi = new SeparatorMenuItem();
-            } else if (m.menuType == Menu.MenuType.BUTTON) {
-                Button btn = new Button(m.text);
+            } else if (m.getMenuType() == Menu.MenuType.BUTTON) {
+                Button btn = new Button(m.getText());
                 mi = new CustomMenuItem(btn);
-            } else if (m.menuType == Menu.MenuType.CHECKBOX) {
-                mi = new CheckMenuItem(m.text);
-            } else if (m.menuType == Menu.MenuType.RADIO) {
-                mi = new RadioMenuItem(m.text);
+            } else if (m.getMenuType() == Menu.MenuType.CHECKBOX) {
+                mi = new CheckMenuItem(m.getText());
+            } else if (m.getMenuType() == Menu.MenuType.RADIO) {
+                mi = new RadioMenuItem(m.getText());
             } else {
-                mi = new MenuItem(m.text);
+                mi = new MenuItem(m.getText());
             }
 
             mi.setMnemonicParsing(true);
@@ -153,8 +153,8 @@ public class MenuPluginImpl implements MenuPlugin {
 
             bindAction(m, mi);
 
-            if (m.hasChilren) {
-                renderMenu((javafx.scene.control.Menu) mi, m.id, list);
+            if (m.getHasChilren()) {
+                renderMenu((javafx.scene.control.Menu) mi, m.getId(), list);
             }
 
             return mi;
@@ -164,13 +164,13 @@ public class MenuPluginImpl implements MenuPlugin {
     }
 
     private void bindAction(Menu m, MenuItem mi) {
-        if (m.actionType == Menu.ActionType.TEMPLATE) {
+        if (m.getActionType() == Menu.ActionType.TEMPLATE) {
             mi.setOnAction((ActionEvent event) -> {
-                Application._getService(Router.class).navigate(m.actionSource);
+                Application._getService(Router.class).navigate(m.getActionSource());
             });
-        } else if (m.actionType == Menu.ActionType.ACTION) {
+        } else if (m.getActionType() == Menu.ActionType.ACTION) {
             try {
-                Class cls = Class.forName(m.actionSource);
+                Class cls = Class.forName(m.getActionSource());
                 if (EventHandler.class.isAssignableFrom(cls)) {
                     mi.setOnAction((EventHandler<ActionEvent>) cls.newInstance());
                 }
@@ -181,9 +181,9 @@ public class MenuPluginImpl implements MenuPlugin {
     }
 
     private void bindGraphic(Menu m, MenuItem mi) {
-        if (m.icon != null) {
+        if (m.getIcon() != null) {
             try {
-                mi.setGraphic(new ImageView(Application._getService(Resource.class).getResourceFile(m.icon).toURL().toString()));
+                mi.setGraphic(new ImageView(Application._getService(Resource.class).getResourceFile(m.getIcon()).toURL().toString()));
             } catch (MalformedURLException ex) {
                 Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.SEVERE, null, ex);
             }

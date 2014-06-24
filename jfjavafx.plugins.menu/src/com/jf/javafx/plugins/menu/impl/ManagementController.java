@@ -21,6 +21,7 @@ import com.jf.javafx.Application;
 import java.net.URL;
 import java.util.ResourceBundle;
 import com.jf.javafx.Controller;
+import com.jf.javafx.annotations.BeanUtils;
 import com.jf.javafx.plugins.menu.MenuPlugin;
 import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
 import com.jf.javafx.services.Plugins;
@@ -28,15 +29,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.FocusModel;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.layout.Pane;
 import org.controlsfx.control.PropertySheet;
-import org.controlsfx.property.BeanPropertyUtils;
 
 /**
  * FXML Controller class
@@ -48,7 +46,7 @@ public class ManagementController extends Controller {
     private TreeView<Menu> treeView;
     
     @FXML
-    private Pane pane;
+    private SplitPane pane;
     
     private TreeItem<Menu> rootNode;
     private PropertySheet ps;
@@ -67,15 +65,15 @@ public class ManagementController extends Controller {
         rootNode = new TreeItem<>(new Menu());
         rootNode.setExpanded(true);
         treeView.setRoot(rootNode);
-        treeView.focusModelProperty().addListener((ObservableValue<? extends FocusModel<TreeItem<Menu>>> observable, FocusModel<TreeItem<Menu>> oldValue, FocusModel<TreeItem<Menu>> newValue) -> {
+        treeView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends TreeItem<Menu>> observable, TreeItem<Menu> oldValue, TreeItem<Menu> newValue) -> {
             ps.getItems().clear();
-            ps.getItems().addAll(BeanPropertyUtils.getProperties(newValue.getFocusedItem().getValue()));
+            ps.getItems().addAll(BeanUtils.getProperties(newValue.getValue()));
         });
         
         renderTree();
-        
+
         ps = new PropertySheet();
-        pane.getChildren().add(ps);
+        pane.getItems().add(ps);
     }    
 
     private void renderTree() {
@@ -90,7 +88,7 @@ public class ManagementController extends Controller {
     
     private void renderTree(TreeItem<Menu> node, List<Menu> l) {
         l.forEach((m) -> {
-            if((m.parent != null && m.parent.equals(node.getValue())) || (m.parent == null && node.getValue().id == 0)) {
+            if((m.getParent() != null && m.getParent().equals(node.getValue())) || (m.getParent() == null && node.getValue().getId() == 0)) {
                 TreeItem<Menu> sub = new TreeItem<>(m);
                 sub.setExpanded(true);
                 
