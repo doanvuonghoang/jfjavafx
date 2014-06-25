@@ -19,6 +19,7 @@ package com.jf.javafx.plugins.impl.datamodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.jf.javafx.datamodels.RecordStatus;
 import java.util.Date;
 
 /**
@@ -27,10 +28,13 @@ import java.util.Date;
  */
 @DatabaseTable(tableName = "Resources")
 public class Resource {
+    public static final String FIELD_PLUGIN = "pluginId";
+    public static final String FIELD_RECORD_STATUS = "recordStatus";
+    
     @DatabaseField(generatedId = true)
     public long id;
     
-    @DatabaseField(foreign = true)
+    @DatabaseField(foreign = true, columnName = FIELD_PLUGIN)
     public Plugin plugin;
     
     @DatabaseField(canBeNull = false)
@@ -45,8 +49,8 @@ public class Resource {
     @DatabaseField
     public String deployPath;
     
-    @DatabaseField(canBeNull = false, defaultValue = "C", width = 1)
-    public String action;
+    @DatabaseField(canBeNull = false, defaultValue = "CREATE", columnName = FIELD_RECORD_STATUS)
+    public RecordStatus recordStatus;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;

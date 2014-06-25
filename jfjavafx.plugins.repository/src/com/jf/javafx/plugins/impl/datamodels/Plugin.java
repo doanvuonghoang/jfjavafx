@@ -21,6 +21,7 @@ import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.jf.javafx.datamodels.RecordStatus;
 import java.util.Date;
 
 /**
@@ -30,6 +31,8 @@ import java.util.Date;
 @DatabaseTable(tableName = "Plugins")
 public class Plugin {
     public static final String FIELD_PLUGIN_CLASS_NAME = "pluginClassName";
+    public static final String FIELD_RECORD_STATUS = "recordStatus";
+    public static final String FIELD_DEBUG = "debug";
     
     @DatabaseField(generatedId = true)
     public long id;
@@ -45,6 +48,12 @@ public class Plugin {
 
     @DatabaseField(width = 4000)
     public String resourcesInString;
+    
+    @DatabaseField(defaultValue = "false", columnName = FIELD_DEBUG)
+    public boolean debug;
+    
+    @DatabaseField(defaultValue = "CREATE", columnName = FIELD_RECORD_STATUS)
+    public RecordStatus recordStatus;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;

@@ -15,22 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.plugins;
-
-import net.xeoh.plugins.base.Plugin;
+package com.jf.javafx.datamodels;
 
 /**
  *
  * @author Hoàng Doãn
  */
-public interface PluginRepository extends Plugin {
-    public boolean isInstalled(String pluginName);
-    
-    public void install(Plugin p) throws Exception;
-    
-    public void install(Class<Plugin> p) throws Exception;
-    
-    public void install(String pluginClassName) throws Exception;
-    
-    public void uninstall(String pluginClassName) throws Exception;
+public enum RecordStatus {
+    CREATE,
+    UPDATE,
+    DELETE
 }

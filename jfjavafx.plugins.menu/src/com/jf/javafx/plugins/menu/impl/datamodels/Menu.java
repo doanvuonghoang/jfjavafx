@@ -48,9 +48,8 @@ public class Menu implements Serializable {
     @DatabaseField
     private String icon;
 
-    @PropertyInfo(name = "Has children", type = Boolean.class, setValue = "setHasChildren", getValue = "getHasChildren")
     @DatabaseField(defaultValue = "false")
-    private boolean hasChilren;
+    private Boolean hasChildren;
 
     @PropertyInfo(name = "Menu type", type = MenuType.class, setValue = "setMenuType", getValue = "getMenuType")
     @DatabaseField(defaultValue = "DEFAULT")
@@ -63,20 +62,23 @@ public class Menu implements Serializable {
     @PropertyInfo(name = "Action source", type = String.class, setValue = "setActionSource", getValue = "getActionSource")
     @DatabaseField
     private String actionSource;
+    
+    @DatabaseField(defaultValue = "false")
+    private Boolean published;
 
-    @PropertyInfo(name = "Created time", type = Date.class, editable = false)
+    @PropertyInfo(name = "Created time", type = Date.class, editable = false, getValue = "getCreatedTime")
     @DatabaseField(canBeNull = false)
     private Date createdTime;
 
-    @PropertyInfo(name = "Creator", type = String.class, editable = false)
+    @PropertyInfo(name = "Creator", type = String.class, editable = false, getValue = "getCreator")
     @DatabaseField(canBeNull = false)
     private String creator;
 
-    @PropertyInfo(name = "Last modified time", type = Date.class, editable = false)
+    @PropertyInfo(name = "Last modified time", type = Date.class, editable = false, getValue = "getLastModifiedTime")
     @DatabaseField
     private Date lastModifiedTime;
 
-    @PropertyInfo(name = "Last modifier", type = String.class, editable = false)
+    @PropertyInfo(name = "Last modifier", type = String.class, editable = false, getValue = "getLastModifier")
     @DatabaseField
     private String lastModifier;
 
@@ -86,7 +88,8 @@ public class Menu implements Serializable {
     public enum ActionType {
 
         TEMPLATE,
-        ACTION
+        ACTION,
+        DEFAULT
     }
 
     public enum MenuType {
@@ -169,17 +172,17 @@ public class Menu implements Serializable {
     }
 
     /**
-     * @return the hasChilren
+     * @return the hasChildren
      */
-    public boolean getHasChilren() {
-        return hasChilren;
+    public boolean getHasChildren() {
+        return hasChildren;
     }
 
     /**
-     * @param hasChilren the hasChilren to set
+     * @param hasChildren the hasChildren to set
      */
-    public void setHasChilren(boolean hasChilren) {
-        this.hasChilren = hasChilren;
+    public void setHasChildren(boolean hasChildren) {
+        this.hasChildren = hasChildren;
     }
 
     /**
@@ -222,6 +225,20 @@ public class Menu implements Serializable {
      */
     public void setActionSource(String actionSource) {
         this.actionSource = actionSource;
+    }
+
+    /**
+     * @return the published
+     */
+    public Boolean getPublished() {
+        return published;
+    }
+
+    /**
+     * @param published the published to set
+     */
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
     /**

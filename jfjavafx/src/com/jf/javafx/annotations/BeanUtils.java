@@ -18,22 +18,28 @@
 package com.jf.javafx.annotations;
 
 import java.lang.reflect.Field;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
+import org.controlsfx.property.editor.PropertyEditor;
 
 /**
  *
  * @author Hoàng Doãn
  */
 public class BeanUtils {
+    private final static DefaultPropertyEditorFactory pef = new DefaultPropertyEditorFactory();
+    
     public static final ObservableList<PropertySheet.Item> getProperties(Object o) {
         ObservableList<PropertySheet.Item> l = FXCollections.observableArrayList();
         
         for(Field f : o.getClass().getDeclaredFields()) {
-            l.add(new BeanProperty(o, f));
+            PropertyInfo info = f.getAnnotation(PropertyInfo.class);
+            if(info != null) l.add(new BeanProperty(o, info));
         }
         
         return l;
@@ -41,13 +47,11 @@ public class BeanUtils {
     
     static class BeanProperty implements PropertySheet.Item {
         Object o;
-        Field f;
         PropertyInfo info;
 
-        public BeanProperty(Object o, Field f) {
+        public BeanProperty(Object o, PropertyInfo info) {
             this.o = o;
-            this.f = f;
-            this.info = f.getAnnotation(PropertyInfo.class);
+            this.info = info;
         }
 
         @Override
@@ -77,7 +81,7 @@ public class BeanUtils {
         @Override
         public Object getValue() {
             try {
-                return o.getClass().getMethod(info.getValue()).invoke(o);
+                return this.o.getClass().getMethod(info.getValue()).invoke(this.o);
             } catch (Exception ex) {
                 Logger.getLogger(BeanUtils.class.getName()).log(Level.SEVERE, null, ex);
                 
@@ -88,11 +92,16 @@ public class BeanUtils {
         @Override
         public void setValue(Object o) {
             try {
-                o.getClass().getMethod(info.setValue(), getType()).invoke(this.o, o);
+                if(info.editable())
+                    this.o.getClass().getMethod(info.setValue(), getType()).invoke(this.o, o);
             } catch (Exception ex) {
                 Logger.getLogger(BeanUtils.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         
+        @Override
+        public boolean isEditable() {
+            return info.editable();
+        }
     }
 }

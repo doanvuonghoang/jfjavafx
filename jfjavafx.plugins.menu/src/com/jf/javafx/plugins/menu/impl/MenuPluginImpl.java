@@ -60,7 +60,7 @@ import net.xeoh.plugins.base.annotations.meta.Version;
 public class MenuPluginImpl implements MenuPlugin {
 
     private final UI uiService = Application._getService(UI.class);
-    private final Dao<Menu, Long> dao = Application._getService(Database.class).createAppDao(Menu.class);
+    private Dao<Menu, Long> dao;
     
     @InjectPlugin
     public PluginRepository pr;
@@ -71,30 +71,40 @@ public class MenuPluginImpl implements MenuPlugin {
                 Application._getService(Database.class).getAppDBUrl()),
                 Menu.class);
         
-        Menu m = new Menu();
-        m.setText("_Start");
-        m.setCreator("SYS");
-        m.setCreatedTime(Calendar.getInstance().getTime());
-//        m.icon = "start.png";
-        m.setHasChilren(true);
-        
-        dao.create(m);
-        
-        Menu sub = new Menu();
-        sub.setText("Setup");
-        sub.setParent(m);
-        sub.setCreator("SYS");
-        sub.setCreatedTime(m.getCreatedTime());
-        sub.setIcon("start.png");
-        sub.setActionType(Menu.ActionType.TEMPLATE);
-        sub.setActionSource("menuManagement/Management");
-        
-        dao.create(sub);
+//        Menu m = new Menu();
+//        m.setText("_Start");
+//        m.setCreator("SYS");
+//        m.setCreatedTime(Calendar.getInstance().getTime());
+////        m.icon = "start.png";
+//        m.setHasChildren(true);
+//        
+//        dao.create(m);
+//        
+//        Menu sub = new Menu();
+//        sub.setText("Setup");
+//        sub.setParent(m);
+//        sub.setCreator("SYS");
+//        sub.setCreatedTime(m.getCreatedTime());
+//        sub.setIcon("start.png");
+//        sub.setActionType(Menu.ActionType.TEMPLATE);
+//        sub.setActionSource("menuManagement/Management");
+//        
+//        dao.create(sub);
+    }
+    
+    public void uninstallPlugin() throws SQLException {
+        TableUtils.dropTable(new DataSourceConnectionSource(
+                Application._getService(Database.class).getAppDataSource(),
+                Application._getService(Database.class).getAppDBUrl()),
+                Menu.class,
+                true);
     }
     
     @Init
-    public void init() {
+    public void init() throws Exception {
         if(!pr.isInstalled(this.getClass().getName())) pr.install(this);
+        
+        dao = Application._getService(Database.class).createAppDao(Menu.class);
         
         render();
     }
@@ -108,7 +118,7 @@ public class MenuPluginImpl implements MenuPlugin {
                 mui.setMnemonicParsing(true);
                 bindGraphic(m, mui);
 
-                if (m.getHasChilren()) {
+                if (m.getHasChildren()) {
                     renderMenu(mui, m.getId(), list);
                 } else {
                     bindAction(m, mui);
@@ -119,7 +129,7 @@ public class MenuPluginImpl implements MenuPlugin {
                 uiService.addMenu(mui);
             });
         } catch (SQLException ex) {
-            Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.WARNING, null, ex);
         }
     }
     
@@ -132,9 +142,9 @@ public class MenuPluginImpl implements MenuPlugin {
         list.stream().filter((m) -> (m.getParent() != null && m.getParent().getId() == id)).map((Menu m) -> {
             MenuItem mi;
 
-            if (m.getHasChilren()) {
+            if (m.getHasChildren()) {
                 mi = new javafx.scene.control.Menu(m.getText());
-            } else if(m.getText() == "-") {
+            } else if(m.getText().equals("-")) {
                 mi = new SeparatorMenuItem();
             } else if (m.getMenuType() == Menu.MenuType.BUTTON) {
                 Button btn = new Button(m.getText());
@@ -153,7 +163,7 @@ public class MenuPluginImpl implements MenuPlugin {
 
             bindAction(m, mi);
 
-            if (m.getHasChilren()) {
+            if (m.getHasChildren()) {
                 renderMenu((javafx.scene.control.Menu) mi, m.getId(), list);
             }
 
@@ -185,7 +195,7 @@ public class MenuPluginImpl implements MenuPlugin {
             try {
                 mi.setGraphic(new ImageView(Application._getService(Resource.class).getResourceFile(m.getIcon()).toURL().toString()));
             } catch (MalformedURLException ex) {
-                Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.WARNING, null, ex);
             }
         }
     }

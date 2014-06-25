@@ -18,8 +18,10 @@ package com.jf.javafx.plugins.impl;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.jdbc.DataSourceConnectionSource;
+import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.table.TableUtils;
 import com.jf.javafx.Application;
+import com.jf.javafx.datamodels.RecordStatus;
 import com.jf.javafx.plugins.ResourceRepository;
 import com.jf.javafx.plugins.impl.datamodels.Resource;
 import com.jf.javafx.services.Database;
@@ -58,34 +60,34 @@ public class ResourceRepositoryImpl implements ResourceRepository {
                 Application._getService(Database.class).getAppDBUrl()),
                 Resource.class);
     }
+    
+    public void uninstallPlugin() throws SQLException {
+        // uninstall resource table
+        TableUtils.dropTable(new DataSourceConnectionSource(
+                Application._getService(Database.class).getAppDataSource(),
+                Application._getService(Database.class).getAppDBUrl()),
+                Resource.class,
+                true);
+    }
 
     @Override
-    public void delete(Resource r) throws ResourceException {
-        if (!r.isDeployed) {
-            r.action = "D";
-            try {
-                dao.update(r);
-            } catch (SQLException ex) {
-                throw new ResourceException(ex.getLocalizedMessage());
-            }
+    public void delete(Resource r) throws Exception {
+        if (!r.isDeployed && r.recordStatus != RecordStatus.DELETE) {
+            r.recordStatus = RecordStatus.DELETE;
+            dao.update(r);
         } else {
             throw new ResourceException("can not delete deployed resource");
         }
     }
 
     @Override
-    public void upload(Resource r) throws ResourceException {
-        try {
-            dao.create(r);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            throw new ResourceException((ex.getLocalizedMessage()));
-        }
+    public void save(Resource r) throws Exception {
+        dao.create(r);
     }
 
     @Override
     public void deploy(Resource r, String toPath) throws Exception {
-        if (!r.isDeployed) {
+        if (!r.isDeployed && r.recordStatus != RecordStatus.DELETE) {
             File dest;
 
             if (r.resourceType == Resource.ResourceType.TEMPLATE) {
@@ -125,19 +127,21 @@ public class ResourceRepositoryImpl implements ResourceRepository {
     }
 
     @Override
-    public void undeploy(Resource r) throws ResourceException {
+    public void undeploy(Resource r) throws Exception {
         // delete deployed file
-        if (r.isDeployed) {
+        if (r.isDeployed && r.recordStatus != RecordStatus.DELETE) {
             Application._getService(com.jf.javafx.services.Resource.class).getResourceFile(r.deployPath).delete();
 
             r.isDeployed = false;
-            try {
-                dao.update(r);
-            } catch (SQLException ex) {
-                throw new ResourceException(ex.getLocalizedMessage());
-            }
+            
+            dao.update(r);
         } else {
             throw new ResourceException("can not undeployed an undeployed resource");
         }
+    }
+
+    @Override
+    public void deletePluginResource(long pluginId) throws Exception {
+        dao.delete(dao.queryForEq(Resource.FIELD_PLUGIN, pluginId));
     }
 }
