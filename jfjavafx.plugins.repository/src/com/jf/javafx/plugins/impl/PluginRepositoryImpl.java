@@ -63,7 +63,7 @@ public class PluginRepositoryImpl implements PluginRepository {
         dao = Application._getService(Database.class).createAppDao(com.jf.javafx.plugins.impl.datamodels.Plugin.class);
 
         if (!isInstalled(this.getClass().getName())) {
-            install(this.getClass().getName());
+            install(this);
         }
 
         if (!isInstalled(rr.getClass().getName())) {
@@ -79,7 +79,7 @@ public class PluginRepositoryImpl implements PluginRepository {
                     .and().ne(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_RECORD_STATUS, RecordStatus.DELETE)
                     .and().eq(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_DEBUG, false).query().isEmpty();
         } catch (SQLException ex) {
-            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.WARNING, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.INFO, null, ex);
         }
 
         return false;
@@ -94,9 +94,9 @@ public class PluginRepositoryImpl implements PluginRepository {
         com.jf.javafx.plugins.impl.datamodels.Plugin model = createPluginModel(p, cfg);
 
         if (model.debug) {
-//            removePlugin(p.getClass().getName());
             executeInternalUninstall(p);
-        }
+            removePlugin(p.getClass().getName());
+        } else if(isInstalled(p.getClass().getName())) return;
 
         executeInternalInstall(p);
 
@@ -170,7 +170,7 @@ public class PluginRepositoryImpl implements PluginRepository {
         try {
             sw.close();
         } catch (IOException ex) {
-            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.WARNING, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.INFO, null, ex);
         }
 
         return result;
@@ -211,7 +211,7 @@ public class PluginRepositoryImpl implements PluginRepository {
                 rr.deploy(r, r.deployPath);
             }
         } catch (Exception ex) {
-            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.WARNING, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.INFO, null, ex);
         }
     }
 
@@ -219,7 +219,7 @@ public class PluginRepositoryImpl implements PluginRepository {
         try {
             p.getClass().getMethod("installPlugin").invoke(p);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.WARNING, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.INFO, null, ex);
         }
     }
 
@@ -227,7 +227,7 @@ public class PluginRepositoryImpl implements PluginRepository {
         try {
             p.getClass().getMethod("uninstallPlugin").invoke(p);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.WARNING, null, ex);
+            Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.INFO, null, ex);
         }
     }
 
@@ -239,7 +239,7 @@ public class PluginRepositoryImpl implements PluginRepository {
 
                 dao.delete(m);
             } catch (Exception ex) {
-                Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.WARNING, null, ex);
+                Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.INFO, null, ex);
             }
         });
     }

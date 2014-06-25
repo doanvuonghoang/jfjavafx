@@ -21,8 +21,6 @@ import com.jf.javafx.Controller;
 import com.jf.javafx.MsgBox;
 import com.jf.javafx.services.Router;
 import com.jf.javafx.services.Security;
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -57,9 +55,7 @@ public class LoginController extends Controller {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        super.initialize(location, resources); //To change body of generated methods, choose Tools | Templates.
-
+    protected void _init() {
         ValidationSupport vs = new ValidationSupport();
         vs.registerValidator(txtUser, true, Validator.createEmptyValidator(this.resources.getString("usernotnull.text")));
 

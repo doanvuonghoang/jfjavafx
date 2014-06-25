@@ -30,4 +30,8 @@ public interface MenuPlugin extends Plugin {
     public void render();
     
     public List<Menu> getAvailableMenues() throws SQLException;
+    
+    public void save(List<Menu> menues) throws Exception;
+    
+    public void save(Menu menu) throws Exception;
 }

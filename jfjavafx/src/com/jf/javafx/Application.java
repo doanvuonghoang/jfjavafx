@@ -212,8 +212,8 @@ public class Application extends javafx.application.Application {
         if (s == null) {
             try {
                 s = (T) n.newInstance();
-                s.init(this);
                 this.services.put(n, s);
+                s.init(this);
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             }

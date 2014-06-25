@@ -22,8 +22,6 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.jf.javafx.Application;
 import com.jf.javafx.Controller;
 import com.jf.javafx.MsgBox;
-import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -34,7 +32,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import org.apache.shiro.SecurityUtils;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 import org.controlsfx.validation.ValidationResult;
@@ -72,9 +69,7 @@ public class InstallController extends Controller {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        super.initialize(location, resources); //To change body of generated methods, choose Tools | Templates.
-        
+    protected void _init() {
         ValidationSupport vs = new ValidationSupport();
         vs.registerValidator(txtDBUrl, true, Validator.createEmptyValidator(this.resources.getString("urlnotnull.text")));
         vs.registerValidator(txtAppUser, true, Validator.createEmptyValidator(this.resources.getString("usernotnull.text")));

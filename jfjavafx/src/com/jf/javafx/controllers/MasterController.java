@@ -19,8 +19,6 @@ package com.jf.javafx.controllers;
 import com.jf.javafx.Application;
 import com.jf.javafx.Controller;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.Interpolator;
@@ -62,16 +60,16 @@ public class MasterController extends Controller {
 
     @FXML
     private BorderPane contentPane;
-    
+
     @FXML
     private ToolBar headPane;
-    
+
     @FXML
     private StackPane modalDimmer;
 
     private Rectangle2D backupWindowBounds = null;
     private boolean maximized = false;
-    
+
     private double mouseDragOffsetX = 0;
     private double mouseDragOffsetY = 0;
 
@@ -83,9 +81,9 @@ public class MasterController extends Controller {
      * Initializes the controller class.
      */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    protected void _init() {
         final Stage stage = app.getStage();
-        
+
         modalDimmer.setOnMouseClicked((MouseEvent t) -> {
             t.consume();
             hideModalMessage();
@@ -100,30 +98,10 @@ public class MasterController extends Controller {
         btnWMax.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                toogleMaximized();
-            }
-
-            private void toogleMaximized() {
-                final Screen screen = Screen.getScreensForRectangle(stage.getX(), stage.getY(), 1, 1).get(0);
-                if (maximized) {
-                    maximized = false;
-                    if (backupWindowBounds != null) {
-                        stage.setX(backupWindowBounds.getMinX());
-                        stage.setY(backupWindowBounds.getMinY());
-                        stage.setWidth(backupWindowBounds.getWidth());
-                        stage.setHeight(backupWindowBounds.getHeight());
-                    }
-                } else {
-                    maximized = true;
-                    backupWindowBounds = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-                    stage.setX(screen.getVisualBounds().getMinX());
-                    stage.setY(screen.getVisualBounds().getMinY());
-                    stage.setWidth(screen.getVisualBounds().getWidth());
-                    stage.setHeight(screen.getVisualBounds().getHeight());
-                }
+                toogleMaximized(stage);
             }
         });
-        
+
         // add window dragging
         headPane.setOnMousePressed((MouseEvent event) -> {
             mouseDragOffsetX = event.getSceneX();
@@ -135,8 +113,33 @@ public class MasterController extends Controller {
                 app.getStage().setY(event.getScreenY() - mouseDragOffsetY);
             }
         });
+        headPane.setOnMousePressed((MouseEvent event) -> {
+            if (event.getClickCount() == 2) {
+                toogleMaximized(stage);
+            }
+        });
     }
-    
+
+    private void toogleMaximized(Stage stage) {
+        final Screen screen = Screen.getScreensForRectangle(stage.getX(), stage.getY(), 1, 1).get(0);
+        if (maximized) {
+            maximized = false;
+            if (backupWindowBounds != null) {
+                stage.setX(backupWindowBounds.getMinX());
+                stage.setY(backupWindowBounds.getMinY());
+                stage.setWidth(backupWindowBounds.getWidth());
+                stage.setHeight(backupWindowBounds.getHeight());
+            }
+        } else {
+            maximized = true;
+            backupWindowBounds = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+            stage.setX(screen.getVisualBounds().getMinX());
+            stage.setY(screen.getVisualBounds().getMinY());
+            stage.setWidth(screen.getVisualBounds().getWidth());
+            stage.setHeight(screen.getVisualBounds().getHeight());
+        }
+    }
+
     public boolean isMaximized() {
         return maximized;
     }
@@ -174,17 +177,19 @@ public class MasterController extends Controller {
                         new KeyValue(modalDimmer.opacityProperty(), 0, Interpolator.EASE_BOTH)
                 )).build().play();
     }
-    
+
     /**
      * Set main content of scene
-     * @param n 
+     *
+     * @param n
      */
     public void setContent(Node n) {
         contentPane.setCenter(n);
     }
-    
+
     /**
      * Set logo of application
+     *
      * @param path resource path
      */
     public void setLogo(String path) {
@@ -194,18 +199,20 @@ public class MasterController extends Controller {
             Logger.getLogger(MasterController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     /**
      * get menu bar of application
-     * @return 
+     *
+     * @return
      */
     public MenuBar getMenuBar() {
         return menuBar;
     }
-    
+
     /**
      * Add a menu to bar
-     * @param m 
+     *
+     * @param m
      */
     public void addMenu(Menu m) {
         menuBar.getMenus().add(m);

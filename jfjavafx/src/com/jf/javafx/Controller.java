@@ -45,5 +45,9 @@ public abstract class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.location = location;
         this.resources = resources;
+        
+        _init();
     }
+    
+    protected abstract void _init();
 }

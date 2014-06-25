@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <autoDeploy>true</autoDeploy>
     <debug>true</debug>
     <resources>
-        <file type="GENERAL" src="start.png" deployPath="start.png" />
+        <file type="GENERAL" src="sitemap.png" deployPath="images/menuManagement/ico.png" />
         <file type="BUNDLE" src="Management.properties" deployPath="menuManagement/Management.properties" />
         <file type="TEMPLATE" src="Management.fxml" deployPath="menuManagement/Management.fxml" />
     </resources>

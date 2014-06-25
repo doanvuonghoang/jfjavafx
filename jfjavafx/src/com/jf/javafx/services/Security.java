@@ -31,10 +31,14 @@ import org.apache.shiro.util.Factory;
  * @author Hoàng Doãn
  */
 public class Security extends AbstractService {
+    
+    private boolean authenticationRequired;
 
     @Override
     protected void _initService() {
-        if (appConfig.getBoolean("authentication.required", true)) {
+        authenticationRequired = appConfig.getBoolean("authentication.required", true);
+        
+        if (authenticationRequired) {
             try {
                 Factory<org.apache.shiro.mgt.SecurityManager> factory = new IniSecurityManagerFactory("url:" + app.getConfig("shiro.ini").toURL().toString());
                 org.apache.shiro.mgt.SecurityManager sm = factory.getInstance();
@@ -73,20 +77,24 @@ public class Security extends AbstractService {
     }
     
     public boolean isPermitted(String str) {
-        if(!appConfig.getBoolean("authentication.required", true)) return true;
+        if(!authenticationRequired) return true;
         return SecurityUtils.getSubject().isPermitted(str);
     }
     
     public void checkPermission(String str) {
-        if(appConfig.getBoolean("authentication.required", true))
+        if(authenticationRequired)
             SecurityUtils.getSubject().checkPermission(str);
     }
     
     public boolean hasRole(String str) {
-        return SecurityUtils.getSubject().hasRole(str);
+        if(authenticationRequired)
+            return SecurityUtils.getSubject().hasRole(str);
+        return true;
     }
     
     public String getUserName() {
-        return SecurityUtils.getSubject().toString();
+        if(authenticationRequired)
+            return SecurityUtils.getSubject().toString();
+        return "Guest";
     }
 }

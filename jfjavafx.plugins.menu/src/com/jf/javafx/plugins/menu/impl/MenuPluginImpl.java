@@ -45,7 +45,6 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.ImageView;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
-import net.xeoh.plugins.base.annotations.events.PluginLoaded;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import net.xeoh.plugins.base.annotations.meta.Author;
 import net.xeoh.plugins.base.annotations.meta.Version;
@@ -60,7 +59,7 @@ import net.xeoh.plugins.base.annotations.meta.Version;
 public class MenuPluginImpl implements MenuPlugin {
 
     private final UI uiService = Application._getService(UI.class);
-    private Dao<Menu, Long> dao;
+    private final Dao<Menu, Long> dao = Application._getService(Database.class).createAppDao(Menu.class);
     
     @InjectPlugin
     public PluginRepository pr;
@@ -71,25 +70,25 @@ public class MenuPluginImpl implements MenuPlugin {
                 Application._getService(Database.class).getAppDBUrl()),
                 Menu.class);
         
-//        Menu m = new Menu();
-//        m.setText("_Start");
-//        m.setCreator("SYS");
-//        m.setCreatedTime(Calendar.getInstance().getTime());
-////        m.icon = "start.png";
-//        m.setHasChildren(true);
-//        
-//        dao.create(m);
-//        
-//        Menu sub = new Menu();
-//        sub.setText("Setup");
-//        sub.setParent(m);
-//        sub.setCreator("SYS");
-//        sub.setCreatedTime(m.getCreatedTime());
-//        sub.setIcon("start.png");
-//        sub.setActionType(Menu.ActionType.TEMPLATE);
-//        sub.setActionSource("menuManagement/Management");
-//        
-//        dao.create(sub);
+        Menu m = new Menu();
+        m.setText("_Start");
+        m.setCreator("SYS");
+        m.setCreatedTime(Calendar.getInstance().getTime());
+//        m.icon = "start.png";
+        m.setHasChildren(true);
+        
+        dao.create(m);
+        
+        Menu sub = new Menu();
+        sub.setText("Setup");
+        sub.setParent(m);
+        sub.setCreator("SYS");
+        sub.setCreatedTime(m.getCreatedTime());
+        sub.setIcon("images/menuManagement/ico.png");
+        sub.setActionType(Menu.ActionType.TEMPLATE);
+        sub.setActionSource("menuManagement/Management");
+        
+        dao.create(sub);
     }
     
     public void uninstallPlugin() throws SQLException {
@@ -102,9 +101,7 @@ public class MenuPluginImpl implements MenuPlugin {
     
     @Init
     public void init() throws Exception {
-        if(!pr.isInstalled(this.getClass().getName())) pr.install(this);
-        
-        dao = Application._getService(Database.class).createAppDao(Menu.class);
+        pr.install(this);
         
         render();
     }
@@ -199,4 +196,22 @@ public class MenuPluginImpl implements MenuPlugin {
             }
         }
     }
+
+    @Override
+    public void save(List<Menu> menues) throws Exception {
+        menues.forEach((m) ->{
+            try {
+                dao.update(m);
+            } catch (SQLException ex) {
+                Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.WARNING, null, ex);
+            }
+        });
+    }
+
+    @Override
+    public void save(Menu menu) throws Exception {
+        dao.update(menu);
+    }
+    
+    
 }

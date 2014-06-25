@@ -49,7 +49,7 @@ public class Plugin {
     @DatabaseField(width = 4000)
     public String resourcesInString;
     
-    @DatabaseField(defaultValue = "false", columnName = FIELD_DEBUG)
+    @DatabaseField(defaultValue = "true", columnName = FIELD_DEBUG)
     public boolean debug;
     
     @DatabaseField(defaultValue = "CREATE", columnName = FIELD_RECORD_STATUS)

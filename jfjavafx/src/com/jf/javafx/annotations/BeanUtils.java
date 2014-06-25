@@ -18,14 +18,12 @@
 package com.jf.javafx.annotations;
 
 import java.lang.reflect.Field;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.DefaultPropertyEditorFactory;
-import org.controlsfx.property.editor.PropertyEditor;
 
 /**
  *
@@ -93,7 +91,7 @@ public class BeanUtils {
         public void setValue(Object o) {
             try {
                 if(info.editable())
-                    this.o.getClass().getMethod(info.setValue(), getType()).invoke(this.o, o);
+                    this.o.getClass().getMethod(info.setValue(), o.getClass()).invoke(this.o, o);
             } catch (Exception ex) {
                 Logger.getLogger(BeanUtils.class.getName()).log(Level.SEVERE, null, ex);
             }
