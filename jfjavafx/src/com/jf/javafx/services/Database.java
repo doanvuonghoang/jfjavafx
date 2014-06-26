@@ -25,6 +25,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -106,21 +107,15 @@ public class Database extends AbstractService {
             if(!i.dbUsername.isEmpty()) t.setUsername(i.dbUsername);
             if(!i.dbPassword.isEmpty()) t.setPassword(i.dbPassword);
 
-//            try {
-//                Hashtable env = new Hashtable();
-//                env.put(Context.INITIAL_CONTEXT_FACTORY,
-//                        "com.sun.jndi.fscontext.RefFSContextFactory");
-//                Context ic = new InitialContext(env);
-//                ic.bind(jndiName, t);
-//            } catch (NamingException ex) {
-//                Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-
             ds = t;
             dss.put(jndiName, ds);
         }
 
         return ds;
+    }
+    
+    public List<String> getAvailableDataSources() {
+        return null;
     }
     
     public DataSource getAppDataSource() {

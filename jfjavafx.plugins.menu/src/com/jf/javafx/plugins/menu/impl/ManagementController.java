@@ -17,8 +17,6 @@
 package com.jf.javafx.plugins.menu.impl;
 
 import com.jf.javafx.Application;
-import java.net.URL;
-import java.util.ResourceBundle;
 import com.jf.javafx.Controller;
 import com.jf.javafx.MsgBox;
 import com.jf.javafx.annotations.BeanUtils;
@@ -26,11 +24,13 @@ import com.jf.javafx.plugins.menu.MenuPlugin;
 import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
 import com.jf.javafx.services.Plugins;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
@@ -68,9 +68,17 @@ public class ManagementController extends Controller {
         rootNode = new TreeItem<>(new Menu());
         rootNode.setExpanded(true);
         treeView.setRoot(rootNode);
+        
+        Map<Menu, ObservableList<PropertySheet.Item>> map = new HashMap<>();
         treeView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends TreeItem<Menu>> observable, TreeItem<Menu> oldValue, TreeItem<Menu> newValue) -> {
             ps.getItems().clear();
-            ps.getItems().addAll(BeanUtils.getProperties(newValue.getValue()));
+            
+            ObservableList<PropertySheet.Item> cur = map.get(newValue.getValue());
+            if(cur == null) {
+                cur = BeanUtils.getProperties(newValue.getValue());
+            }
+            
+            ps.getItems().addAll(cur);
         });
 
         renderTree();

@@ -20,6 +20,8 @@ package com.jf.javafx.annotations;
 import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.controlsfx.control.PropertySheet;
@@ -41,6 +43,17 @@ public class BeanUtils {
         }
         
         return l;
+    }
+    
+    private static final String getResource(String expr, Object o) {
+        Pattern p = Pattern.compile("", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(expr);
+        
+        if(m.find()) {
+            return m.group();
+        }
+        
+        return expr;
     }
     
     static class BeanProperty implements PropertySheet.Item {
