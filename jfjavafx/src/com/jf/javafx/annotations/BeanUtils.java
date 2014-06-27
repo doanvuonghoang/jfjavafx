@@ -46,11 +46,15 @@ public class BeanUtils {
     }
     
     private static final String getResource(String expr, Object o) {
-        Pattern p = Pattern.compile("", Pattern.CASE_INSENSITIVE);
+        Pattern p = Pattern.compile("^R\\{([^}]+)\\}$", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(expr);
         
         if(m.find()) {
-            return m.group();
+            try {
+                return (String) o.getClass().getMethod("getResource", String.class).invoke(o, m.group(1));
+            } catch (Exception ex) {
+                Logger.getLogger(BeanUtils.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         return expr;
@@ -73,19 +77,19 @@ public class BeanUtils {
 
         @Override
         public String getCategory() {
-            if(info != null) return info.category();
+            if(info != null) return getResource(info.category(), o);
             return "Default";
         }
 
         @Override
         public String getName() {
-            if(info != null) return info.name();
+            if(info != null) return getResource(info.name(), o);
             return "[no name]";
         }
 
         @Override
         public String getDescription() {
-            if(info != null) return info.description();
+            if(info != null) return getResource(info.description(), o);
             return "";
         }
 

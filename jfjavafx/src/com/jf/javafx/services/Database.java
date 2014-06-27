@@ -23,9 +23,10 @@ import com.jf.javafx.AbstractService;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Dictionary;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,8 +50,8 @@ import org.apache.commons.dbcp2.BasicDataSource;
  */
 public class Database extends AbstractService {
 
-    private Dictionary<String, DBInfo> infos = new Hashtable<>();
-    private Dictionary<String, DataSource> dss = new Hashtable<>();
+    private Map<String, DBInfo> infos = new Hashtable<>();
+    private Map<String, DataSource> dss = new Hashtable<>();
 
     @Override
     protected void _initService() {
@@ -114,8 +115,8 @@ public class Database extends AbstractService {
         return ds;
     }
     
-    public List<String> getAvailableDataSources() {
-        return null;
+    public Collection<String> getAvailableDataSources() {
+        return infos.keySet();
     }
     
     public DataSource getAppDataSource() {
@@ -155,6 +156,11 @@ public class Database extends AbstractService {
             this.dbUsername = dbUsername;
             this.dbPassword = dbPassword;
             this.dsProvider = dsProvider;
+        }
+        
+        @Override
+        public String toString() {
+            return jndiName;
         }
     }
 }
