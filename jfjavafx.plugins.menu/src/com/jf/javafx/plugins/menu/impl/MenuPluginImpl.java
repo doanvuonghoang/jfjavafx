@@ -18,6 +18,7 @@ package com.jf.javafx.plugins.menu.impl;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.jdbc.DataSourceConnectionSource;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.TableUtils;
 import com.jf.javafx.Application;
 import com.jf.javafx.MsgBox;
@@ -72,6 +73,7 @@ public class MenuPluginImpl implements MenuPlugin {
         
         Menu m = new Menu();
         m.setText("_Start");
+        m.setPublished(Boolean.TRUE);
         m.setCreator("SYS");
         m.setCreatedTime(Calendar.getInstance().getTime());
 //        m.icon = "start.png";
@@ -82,6 +84,7 @@ public class MenuPluginImpl implements MenuPlugin {
         Menu sub = new Menu();
         sub.setText("Setup");
         sub.setParent(m);
+        sub.setPublished(Boolean.TRUE);
         sub.setCreator("SYS");
         sub.setCreatedTime(m.getCreatedTime());
         sub.setIcon("images/menuManagement/ico.png");
@@ -125,14 +128,18 @@ public class MenuPluginImpl implements MenuPlugin {
             }).forEach((mui) -> {
                 uiService.addMenu(mui);
             });
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.WARNING, null, ex);
         }
     }
     
     @Override
-    public List<Menu> getAvailableMenues() throws SQLException {
-        return dao.queryForAll();
+    public List<Menu> getAvailableMenues() throws Exception {
+        QueryBuilder<Menu, Long> builder = dao.queryBuilder();
+        builder.where().eq(Menu.FIELD_PUBLISHED, Boolean.TRUE);
+        builder.orderBy(Menu.FIELD_SHOW_SEQUENCE, true);
+        
+        return builder.query();
     }
 
     private void renderMenu(javafx.scene.control.Menu mui, long id, List<Menu> list) {
@@ -211,6 +218,11 @@ public class MenuPluginImpl implements MenuPlugin {
     @Override
     public void save(Menu menu) throws Exception {
         dao.update(menu);
+    }
+
+    @Override
+    public void delete(Menu menu) throws Exception {
+        dao.delete(menu);
     }
     
     

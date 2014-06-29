@@ -18,7 +18,6 @@
 package com.jf.javafx.plugins.menu;
 
 import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
-import java.sql.SQLException;
 import java.util.List;
 import net.xeoh.plugins.base.Plugin;
 
@@ -29,9 +28,11 @@ import net.xeoh.plugins.base.Plugin;
 public interface MenuPlugin extends Plugin {
     public void render();
     
-    public List<Menu> getAvailableMenues() throws SQLException;
+    public List<Menu> getAvailableMenues() throws Exception;
     
     public void save(List<Menu> menues) throws Exception;
     
     public void save(Menu menu) throws Exception;
+    
+    public void delete(Menu menu) throws Exception;
 }

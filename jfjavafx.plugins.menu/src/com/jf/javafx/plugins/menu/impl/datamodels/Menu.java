@@ -20,16 +20,11 @@ import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
-import com.jf.javafx.Application;
 import com.jf.javafx.annotations.PropertyInfo;
-import com.jf.javafx.services.Security;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Date;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 
 /**
  *
@@ -37,6 +32,9 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 @DatabaseTable(tableName = "Menues")
 public class Menu implements Serializable {
+    
+    public final static String FIELD_PUBLISHED = "published";
+    public final static String FIELD_SHOW_SEQUENCE = "showSequence";
 
     @DatabaseField(generatedId = true)
     private long id;
@@ -45,7 +43,7 @@ public class Menu implements Serializable {
     private Menu parent;
 
     @PropertyInfo(name = "Text", type = String.class, setValue = "setText", getValue = "getText")
-    @DatabaseField(unique = true, canBeNull = false)
+    @DatabaseField(canBeNull = false)
     private String text;
 
     @PropertyInfo(name = "Icon", type = String.class, setValue = "setIcon", getValue = "getIcon")
@@ -68,8 +66,12 @@ public class Menu implements Serializable {
     private String actionSource;
     
     @PropertyInfo(name = "Published", type = Boolean.class, setValue = "setPublished", getValue = "getPublished")
-    @DatabaseField(defaultValue = "false")
-    private Boolean published;
+    @DatabaseField(defaultValue = "false", columnName = FIELD_PUBLISHED)
+    private Boolean published = Boolean.FALSE;
+    
+    @PropertyInfo(name = "Show sequence", type = Integer.class, setValue = "setShowSequence", getValue = "getShowSequence")
+    @DatabaseField(defaultValue = "0", columnName = FIELD_SHOW_SEQUENCE)
+    private Integer showSequence = 0;
 
     @PropertyInfo(name = "Created time", type = Date.class, editable = false, getValue = "getCreatedTime")
     @DatabaseField(canBeNull = false)
@@ -90,12 +92,6 @@ public class Menu implements Serializable {
     @ForeignCollectionField
     private ForeignCollection<Menu> children;
 
-    private void markChanged() {
-        lastModifier = Application._getService(Security.class).getUserName();
-        lastModifiedTime = Calendar.getInstance().getTime();
-        changedProperty.set(true);
-    }
-
     public enum ActionType {
 
         TEMPLATE,
@@ -112,8 +108,15 @@ public class Menu implements Serializable {
         DEFAULT
     }
     
-    private final ObjectProperty<Boolean> publishedProperty = new SimpleObjectProperty<Boolean>(this, "published");
-    private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+     public void addPropertyChangeListener(PropertyChangeListener listener) {
+         this.pcs.addPropertyChangeListener(listener);
+     }
+
+     public void removePropertyChangeListener(PropertyChangeListener listener) {
+         this.pcs.removePropertyChangeListener(listener);
+     }
 
     @Override
     public String toString() {
@@ -155,7 +158,6 @@ public class Menu implements Serializable {
      */
     public void setParent(Menu parent) {
         this.parent = parent;
-        markChanged();
     }
 
     /**
@@ -169,8 +171,9 @@ public class Menu implements Serializable {
      * @param text the text to set
      */
     public void setText(String text) {
+        String oldVal = this.text;
         this.text = text;
-        markChanged();
+        this.pcs.firePropertyChange("text", oldVal, this.text);
     }
 
     /**
@@ -184,8 +187,9 @@ public class Menu implements Serializable {
      * @param icon the icon to set
      */
     public void setIcon(String icon) {
+        String oldVal = this.icon;
         this.icon = icon;
-        markChanged();
+        this.pcs.firePropertyChange("icon", oldVal, this.icon);
     }
 
     /**
@@ -199,8 +203,9 @@ public class Menu implements Serializable {
      * @param hasChildren the hasChildren to set
      */
     public void setHasChildren(boolean hasChildren) {
+        Boolean oldVal = this.hasChildren;
         this.hasChildren = hasChildren;
-        markChanged();
+        this.pcs.firePropertyChange("hasChildren", oldVal, this.hasChildren);
     }
 
     /**
@@ -214,8 +219,9 @@ public class Menu implements Serializable {
      * @param menuType the menuType to set
      */
     public void setMenuType(MenuType menuType) {
+        MenuType oldVal = this.menuType;
         this.menuType = menuType;
-        markChanged();
+        this.pcs.firePropertyChange("menuType", oldVal, this.menuType);
     }
 
     /**
@@ -229,8 +235,9 @@ public class Menu implements Serializable {
      * @param actionType the actionType to set
      */
     public void setActionType(ActionType actionType) {
+        ActionType oldVal = this.actionType;
         this.actionType = actionType;
-        markChanged();
+        this.pcs.firePropertyChange("actionType", oldVal, this.actionType);
     }
 
     /**
@@ -244,8 +251,9 @@ public class Menu implements Serializable {
      * @param actionSource the actionSource to set
      */
     public void setActionSource(String actionSource) {
+        String oldVal = this.actionSource;
         this.actionSource = actionSource;
-        markChanged();
+        this.pcs.firePropertyChange("actionSource", oldVal, this.actionSource);
     }
 
     /**
@@ -259,8 +267,25 @@ public class Menu implements Serializable {
      * @param published the published to set
      */
     public void setPublished(Boolean published) {
-        this.publishedProperty.set(published);
-        markChanged();
+        Boolean oldVal = this.published;
+        this.published = published;
+        this.pcs.firePropertyChange("published", oldVal, this.published);
+    }
+
+    /**
+     * @return the showSequence
+     */
+    public Integer getShowSequence() {
+        return showSequence;
+    }
+
+    /**
+     * @param showSequence the showSequence to set
+     */
+    public void setShowSequence(Integer showSequence) {
+        Integer oldVal = this.showSequence;
+        this.showSequence = showSequence;
+        this.pcs.firePropertyChange("showSequence", oldVal, this.showSequence);
     }
 
     /**
@@ -331,19 +356,5 @@ public class Menu implements Serializable {
      */
     public void setChildren(ForeignCollection<Menu> children) {
         this.children = children;
-    }
-
-    /**
-     * @return the publishedProperty
-     */
-    public ObjectProperty<Boolean> publishedProperty() {
-        return publishedProperty;
-    }
-
-    /**
-     * @return the changedProperty
-     */
-    public BooleanProperty changedProperty() {
-        return changedProperty;
     }
 }

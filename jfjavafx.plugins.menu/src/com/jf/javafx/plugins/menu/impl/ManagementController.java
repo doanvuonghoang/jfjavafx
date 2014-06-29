@@ -23,7 +23,10 @@ import com.jf.javafx.annotations.BeanUtils;
 import com.jf.javafx.plugins.menu.MenuPlugin;
 import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
 import com.jf.javafx.services.Plugins;
+import com.jf.javafx.services.Security;
+import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +36,15 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 
 /**
  * FXML Controller class
@@ -51,10 +59,14 @@ public class ManagementController extends Controller {
     @FXML
     private SplitPane pane;
 
+    @FXML
+    private TextField txtNewMenu;
+
     private TreeItem<Menu> rootNode;
     private PropertySheet ps;
 
     private final MenuPlugin p = Application._getService(Plugins.class).getPlugin(MenuPlugin.class);
+    private final ValidationSupport validationSupport = new ValidationSupport();
 
     public ManagementController(Application app) {
         super(app);
@@ -68,16 +80,17 @@ public class ManagementController extends Controller {
         rootNode = new TreeItem<>(new Menu());
         rootNode.setExpanded(true);
         treeView.setRoot(rootNode);
-        
+
         Map<Menu, ObservableList<PropertySheet.Item>> map = new HashMap<>();
         treeView.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends TreeItem<Menu>> observable, TreeItem<Menu> oldValue, TreeItem<Menu> newValue) -> {
             ps.getItems().clear();
-            
+
             ObservableList<PropertySheet.Item> cur = map.get(newValue.getValue());
-            if(cur == null) {
+            if (cur == null) {
                 cur = BeanUtils.getProperties(newValue.getValue());
+                map.put(newValue.getValue(), cur);
             }
-            
+
             ps.getItems().addAll(cur);
         });
 
@@ -85,6 +98,8 @@ public class ManagementController extends Controller {
 
         ps = new PropertySheet();
         pane.getItems().add(ps);
+
+        validationSupport.registerValidator(txtNewMenu, Validator.createEmptyValidator(resources.getString("newMenuInvalid.text")));
     }
 
     private void renderTree() {
@@ -92,7 +107,7 @@ public class ManagementController extends Controller {
             List<Menu> l = p.getAvailableMenues();
 
             renderTree(rootNode, l);
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(ManagementController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -100,22 +115,7 @@ public class ManagementController extends Controller {
     private void renderTree(TreeItem<Menu> node, List<Menu> l) {
         l.forEach((m) -> {
             if ((m.getParent() != null && m.getParent().equals(node.getValue())) || (m.getParent() == null && node.getValue().getId() == 0)) {
-                TreeItem<Menu> sub = new TreeItem<>(m);
-                sub.setExpanded(true);
-                displayPublishedIcon(sub, m.getPublished());
-
-                m.publishedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                    displayPublishedIcon(sub, newValue);
-                });
-                m.changedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                    if (newValue) {
-                        try {
-                            p.save(m);
-                        } catch (Exception ex) {
-                            MsgBox.showException(ex);
-                        }
-                    }
-                });
+                TreeItem<Menu> sub = createTreeItem(m);
 
                 node.getChildren().add(sub);
 
@@ -132,4 +132,67 @@ public class ManagementController extends Controller {
         }
     }
 
+    public void onAddNewMenu_click() {
+        if (!validationSupport.isInvalid()) {
+            Menu parent = treeView.getSelectionModel().getSelectedItem().getValue();
+            Menu m = new Menu();
+            m.setText(txtNewMenu.getText());
+            m.setParent(parent);
+            try {
+                p.save(m);
+            } catch (Exception ex) {
+                Logger.getLogger(ManagementController.class.getName()).log(Level.WARNING, null, ex);
+            }
+
+            treeView.getSelectionModel().getSelectedItem().getChildren().add(createTreeItem(m));
+        }
+    }
+
+    public void onDeleteMenu_click() {
+        Menu m = treeView.getSelectionModel().getSelectedItem().getValue();
+
+        if (m != null) {
+            Action a = MsgBox.showConfirm(resources.getString("confirmTitle.text"), resources.getString("confirmMsg.text"));
+            if (a == Dialog.Actions.OK) {
+                try {
+                    p.delete(m);
+                    
+                    treeView.getSelectionModel().getSelectedItem().getParent().getChildren().remove(treeView.getSelectionModel().getSelectedItem());
+                } catch (Exception ex) {
+                    Logger.getLogger(ManagementController.class.getName()).log(Level.WARNING, null, ex);
+                }
+            }
+        }
+    }
+
+    private TreeItem<Menu> createTreeItem(Menu m) {
+        TreeItem<Menu> sub = new TreeItem<>(m);
+        sub.setExpanded(true);
+        displayPublishedIcon(sub, m.getPublished());
+
+        m.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            if (evt.getPropertyName().equals("published")) {
+                displayPublishedIcon(sub, (Boolean)evt.getNewValue());
+            }
+
+            m.setLastModifier(Application._getService(Security.class).getUserName());
+            m.setLastModifiedTime(Calendar.getInstance().getTime());
+            try {
+                p.save(m);
+            } catch (Exception ex) {
+                MsgBox.showException(ex);
+            }
+            
+            if (evt.getPropertyName().equals("showSequence")) {
+                refreshTree();
+            }
+        });
+        return sub;
+    }
+
+    private void refreshTree() {
+        ps.getItems().clear();
+        rootNode.getChildren().clear();
+        renderTree();
+    }
 }
