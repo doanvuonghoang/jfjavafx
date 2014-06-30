@@ -23,6 +23,7 @@ import com.jf.javafx.annotations.BeanUtils;
 import com.jf.javafx.plugins.menu.MenuPlugin;
 import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
 import com.jf.javafx.services.Plugins;
+import com.jf.javafx.services.Security;
 import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 import java.util.HashMap;
@@ -75,6 +76,8 @@ public class ManagementController extends Controller {
      */
     @Override
     protected void _init() {
+        app.getService(Security.class).checkPermission("app.menu:manage");
+        
         rootNode = new TreeItem<>(new Menu());
         rootNode.setExpanded(true);
         treeView.setRoot(rootNode);
