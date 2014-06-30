@@ -23,7 +23,6 @@ import com.jf.javafx.AbstractService;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
@@ -50,8 +49,8 @@ import org.apache.commons.dbcp2.BasicDataSource;
  */
 public class Database extends AbstractService {
 
-    private Map<String, DBInfo> infos = new Hashtable<>();
-    private Map<String, DataSource> dss = new Hashtable<>();
+    private final Map<String, DBInfo> infos = new Hashtable<>();
+    private final Map<String, DataSource> dss = new Hashtable<>();
 
     @Override
     protected void _initService() {
