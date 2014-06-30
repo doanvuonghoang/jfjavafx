@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.plugins.auth.impl;
+package com.jf.javafx.plugins.security.impl;
 
-import com.jf.javafx.plugins.auth.AuthPlugin;
+import com.jf.javafx.plugins.security.SecurityPlugin;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -25,6 +25,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * @author Hoàng Doãn
  */
 @PluginImplementation
-public class AuthPluginImpl implements AuthPlugin {
+public class SecurityPluginImpl implements SecurityPlugin {
     
 }

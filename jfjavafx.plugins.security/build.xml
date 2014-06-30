@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="jfjavafx.plugins.auth" default="default" basedir=".">
-    <description>Builds, tests, and runs the project jfjavafx.plugins.auth.</description>
+<project name="jfjavafx.plugins.security" default="default" basedir=".">
+    <description>Builds, tests, and runs the project jfjavafx.plugins.security.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
@@ -58,7 +58,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="jfjavafx.plugins.auth-impl.jar">
+        <target name="run" depends="jfjavafx.plugins.security-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>

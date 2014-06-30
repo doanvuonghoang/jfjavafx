@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.jf.javafx.plugins.auth;
+package com.jf.javafx.plugins.security;
 
 import net.xeoh.plugins.base.Plugin;
 
@@ -12,6 +12,6 @@ import net.xeoh.plugins.base.Plugin;
  *
  * @author Hoàng Doãn
  */
-public interface AuthPlugin extends Plugin {
+public interface SecurityPlugin extends Plugin {
     
 }
