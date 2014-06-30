@@ -28,11 +28,12 @@ import java.util.logging.Logger;
  *
  * @author Hoàng Doãn
  */
-public class DataSource implements javax.sql.DataSource {
+public class DataSourceWrapper implements javax.sql.DataSource {
     
     private String dsString;
+    private javax.sql.DataSource ds;
 
-    public DataSource() {
+    public DataSourceWrapper() {
     }
 
     public String getDsString() {
@@ -41,52 +42,53 @@ public class DataSource implements javax.sql.DataSource {
 
     public void setDsString(String dsString) {
         this.dsString = dsString;
+        
+        this.ds = Application._getService(Database.class).getDataSource(dsString);
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return Application._getService(Database.class).getConnection(dsString);
+        return this.ds.getConnection();
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return Application._getService(Database.class).getConnection(dsString);
+        return this.ds.getConnection(username, password);
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return new PrintWriter(System.out);
+        return this.ds.getLogWriter();
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
-        // Do nothing
+        this.ds.setLogWriter(out);
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-        
+        this.ds.setLoginTimeout(seconds);
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.ds.getLoginTimeout();
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.ds.getParentLogger();
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.ds.unwrap(iface);
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.ds.isWrapperFor(iface);
     }
-    
     
 }

@@ -25,29 +25,25 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
+import org.controlsfx.dialog.Dialogs;
 
 /**
  *
  * @author Hoàng Doãn
  */
 public class Security extends AbstractService {
-    
+
     private boolean authenticationRequired;
 
     @Override
     protected void _initService() {
         authenticationRequired = appConfig.getBoolean("authentication.required", true);
-        
+
         if (authenticationRequired) {
             try {
                 Factory<org.apache.shiro.mgt.SecurityManager> factory = new IniSecurityManagerFactory("url:" + app.getConfig("shiro.ini").toURL().toString());
                 org.apache.shiro.mgt.SecurityManager sm = factory.getInstance();
                 SecurityUtils.setSecurityManager(sm);
-
-                Subject currentUser = SecurityUtils.getSubject();
-                if (!currentUser.isAuthenticated()) {
-                    app.getService(Router.class).navigate(appConfig.getString("authentication.login", "Login"));
-                }
             } catch (MalformedURLException ex) {
                 Logger.getLogger(Security.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -64,8 +60,7 @@ public class Security extends AbstractService {
         Subject currentUser = SecurityUtils.getSubject();
         if (!currentUser.isAuthenticated()) {
             currentUser.login(new UsernamePasswordToken(userName, rawPassword));
-            
-            app.getService(Router.class).back();
+//            app.getService(Router.class).back();
         }
     }
 
@@ -75,26 +70,46 @@ public class Security extends AbstractService {
     public void logout() {
         SecurityUtils.getSubject().logout();
     }
-    
+
     public boolean isPermitted(String str) {
-        if(!authenticationRequired) return true;
+        if (!authenticationRequired) {
+            return true;
+        }
         return SecurityUtils.getSubject().isPermitted(str);
     }
-    
+
     public void checkPermission(String str) {
-        if(authenticationRequired)
-            SecurityUtils.getSubject().checkPermission(str);
+        if (authenticationRequired) {
+            Subject currentUser = SecurityUtils.getSubject();
+            if (!currentUser.isAuthenticated()) {
+                showLogin();
+            }
+
+            currentUser.checkPermission(str);
+        }
     }
-    
+
     public boolean hasRole(String str) {
-        if(authenticationRequired)
+        if (authenticationRequired) {
             return SecurityUtils.getSubject().hasRole(str);
+        }
         return true;
     }
-    
+
     public String getUserName() {
-        if(authenticationRequired)
+        if (authenticationRequired) {
             return SecurityUtils.getSubject().toString();
+        }
         return "Guest";
+    }
+
+    private void showLogin() {
+//        app.getService(Router.class).navigate(appConfig.getString("authentication.login", "Login"));
+        Dialogs.create()
+                .showLogin(new Dialogs.UserInfo("user", "password"), info -> {
+                    login(info.getUserName(), info.getPassword());
+                    return null;
+                }
+                );
     }
 }
