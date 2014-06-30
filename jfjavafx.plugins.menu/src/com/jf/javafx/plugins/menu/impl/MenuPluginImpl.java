@@ -83,7 +83,7 @@ public class MenuPluginImpl implements MenuPlugin {
         dao.create(m);
 
         Menu sub = new Menu();
-        sub.setText("Setup");
+        sub.setText("Menu management");
         sub.setParent(m);
         sub.setPublished(Boolean.TRUE);
         sub.setCreator("SYS");
