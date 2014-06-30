@@ -28,11 +28,12 @@ import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
 import com.jf.javafx.services.Database;
 import com.jf.javafx.services.Resource;
 import com.jf.javafx.services.Router;
+import com.jf.javafx.services.Security;
 import com.jf.javafx.services.UI;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.List;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -61,7 +62,7 @@ public class MenuPluginImpl implements MenuPlugin {
 
     private final UI uiService = Application._getService(UI.class);
     private final Dao<Menu, Long> dao = Application._getService(Database.class).createAppDao(Menu.class);
-    
+
     @InjectPlugin
     public PluginRepository pr;
 
@@ -70,7 +71,7 @@ public class MenuPluginImpl implements MenuPlugin {
                 Application._getService(Database.class).getAppDataSource(),
                 Application._getService(Database.class).getAppDBUrl()),
                 Menu.class);
-        
+
         Menu m = new Menu();
         m.setText("_Start");
         m.setPublished(Boolean.TRUE);
@@ -78,9 +79,9 @@ public class MenuPluginImpl implements MenuPlugin {
         m.setCreatedTime(Calendar.getInstance().getTime());
 //        m.icon = "start.png";
         m.setHasChildren(true);
-        
+
         dao.create(m);
-        
+
         Menu sub = new Menu();
         sub.setText("Setup");
         sub.setParent(m);
@@ -90,10 +91,10 @@ public class MenuPluginImpl implements MenuPlugin {
         sub.setIcon("images/menuManagement/ico.png");
         sub.setActionType(Menu.ActionType.TEMPLATE);
         sub.setActionSource("menuManagement/Management");
-        
+
         dao.create(sub);
     }
-    
+
     public void uninstallPlugin() throws SQLException {
         TableUtils.dropTable(new DataSourceConnectionSource(
                 Application._getService(Database.class).getAppDataSource(),
@@ -101,18 +102,18 @@ public class MenuPluginImpl implements MenuPlugin {
                 Menu.class,
                 true);
     }
-    
+
     @Init
     public void init() throws Exception {
         pr.install(this);
-        
+
         render();
     }
 
     @Override
     public void render() {
         try {
-            List<Menu> list = getAvailableMenues();
+            Collection<Menu> list = getAvailableMenues();
             list.stream().filter((m) -> (m.getParent() == null)).map((m) -> {
                 javafx.scene.control.Menu mui = new javafx.scene.control.Menu(m.getText());
                 mui.setMnemonicParsing(true);
@@ -132,23 +133,31 @@ public class MenuPluginImpl implements MenuPlugin {
             Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.WARNING, null, ex);
         }
     }
-    
+
     @Override
-    public List<Menu> getAvailableMenues() throws Exception {
+    public Collection<Menu> getAvailableMenues() throws Exception {
         QueryBuilder<Menu, Long> builder = dao.queryBuilder();
         builder.where().eq(Menu.FIELD_PUBLISHED, Boolean.TRUE);
         builder.orderBy(Menu.FIELD_SHOW_SEQUENCE, true);
-        
+
         return builder.query();
     }
 
-    private void renderMenu(javafx.scene.control.Menu mui, long id, List<Menu> list) {
+    @Override
+    public Collection<Menu> getAllMenues() throws Exception {
+        QueryBuilder<Menu, Long> builder = dao.queryBuilder();
+        builder.orderBy(Menu.FIELD_SHOW_SEQUENCE, true);
+
+        return builder.query();
+    }
+
+    private void renderMenu(javafx.scene.control.Menu mui, long id, Collection<Menu> list) {
         list.stream().filter((m) -> (m.getParent() != null && m.getParent().getId() == id)).map((Menu m) -> {
             MenuItem mi;
 
             if (m.getHasChildren()) {
                 mi = new javafx.scene.control.Menu(m.getText());
-            } else if(m.getText().equals("-")) {
+            } else if (m.getText().equals("-")) {
                 mi = new SeparatorMenuItem();
             } else if (m.getMenuType() == Menu.MenuType.BUTTON) {
                 Button btn = new Button(m.getText());
@@ -162,7 +171,7 @@ public class MenuPluginImpl implements MenuPlugin {
             }
 
             mi.setMnemonicParsing(true);
-            
+
             bindGraphic(m, mi);
 
             bindAction(m, mi);
@@ -205,9 +214,16 @@ public class MenuPluginImpl implements MenuPlugin {
     }
 
     @Override
-    public void save(List<Menu> menues) throws Exception {
-        menues.forEach((m) ->{
+    public void create(Menu menu) throws Exception {
+        dao.create(menu);
+    }
+
+    @Override
+    public void save(Collection<Menu> menues) throws Exception {
+        menues.forEach((m) -> {
             try {
+                m.setLastModifier(Application._getService(Security.class).getUserName());
+                m.setLastModifiedTime(Calendar.getInstance().getTime());
                 dao.update(m);
             } catch (SQLException ex) {
                 Logger.getLogger(MenuPluginImpl.class.getName()).log(Level.WARNING, null, ex);
@@ -217,6 +233,8 @@ public class MenuPluginImpl implements MenuPlugin {
 
     @Override
     public void save(Menu menu) throws Exception {
+        menu.setLastModifier(Application._getService(Security.class).getUserName());
+        menu.setLastModifiedTime(Calendar.getInstance().getTime());
         dao.update(menu);
     }
 
@@ -224,6 +242,5 @@ public class MenuPluginImpl implements MenuPlugin {
     public void delete(Menu menu) throws Exception {
         dao.delete(menu);
     }
-    
-    
+
 }

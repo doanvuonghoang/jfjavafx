@@ -18,7 +18,7 @@
 package com.jf.javafx.plugins.menu;
 
 import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
-import java.util.List;
+import java.util.Collection;
 import net.xeoh.plugins.base.Plugin;
 
 /**
@@ -28,9 +28,13 @@ import net.xeoh.plugins.base.Plugin;
 public interface MenuPlugin extends Plugin {
     public void render();
     
-    public List<Menu> getAvailableMenues() throws Exception;
+    public Collection<Menu> getAvailableMenues() throws Exception;
     
-    public void save(List<Menu> menues) throws Exception;
+    public Collection<Menu> getAllMenues() throws Exception;
+    
+    public void create(Menu menu) throws Exception;
+    
+    public void save(Collection<Menu> menues) throws Exception;
     
     public void save(Menu menu) throws Exception;
     

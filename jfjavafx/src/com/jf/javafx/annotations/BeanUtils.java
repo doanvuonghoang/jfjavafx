@@ -108,7 +108,7 @@ public class BeanUtils {
         public void setValue(Object o) {
             try {
                 if(info.editable())
-                    this.o.getClass().getMethod(info.setValue(), o.getClass()).invoke(this.o, o);
+                    this.o.getClass().getMethod(info.setValue(), getType()).invoke(this.o, o);
             } catch (Exception ex) {
                 Logger.getLogger(BeanUtils.class.getName()).log(Level.SEVERE, null, ex);
             }

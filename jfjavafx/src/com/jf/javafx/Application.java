@@ -277,7 +277,6 @@ public class Application extends javafx.application.Application {
             try {
                 bundle = getResourceBundle("controllers/" + path);
             } catch (Exception ex) {
-                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
                 bundle = null;
             }
 
@@ -303,7 +302,6 @@ public class Application extends javafx.application.Application {
             node = loader.load();
             controller = loader.getController();
         } catch (IOException ex) {
-            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             MsgBox.showException(ex, "Error while navigate to path: " + path);
 
             // customize error screen

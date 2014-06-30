@@ -17,11 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <configuration>
-    <autoDeploy>true</autoDeploy>
     <debug>false</debug>
     <resources>
-        <file type="GENERAL" src="graphic-design.png" deployPath="images/menuManagement/ico.png" />
-        <file type="BUNDLE" src="Management.properties" deployPath="menuManagement/Management.properties" />
-        <file type="TEMPLATE" src="Management.fxml" deployPath="menuManagement/Management.fxml" />
     </resources>
 </configuration>

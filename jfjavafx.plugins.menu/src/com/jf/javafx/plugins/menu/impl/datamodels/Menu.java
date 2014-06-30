@@ -24,6 +24,7 @@ import com.jf.javafx.annotations.PropertyInfo;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -75,11 +76,11 @@ public class Menu implements Serializable {
 
     @PropertyInfo(name = "Created time", type = Date.class, editable = false, getValue = "getCreatedTime")
     @DatabaseField(canBeNull = false)
-    private Date createdTime;
+    private Date createdTime = Calendar.getInstance().getTime();
 
     @PropertyInfo(name = "Creator", type = String.class, editable = false, getValue = "getCreator")
     @DatabaseField(canBeNull = false)
-    private String creator;
+    private String creator = "SYS";
 
     @PropertyInfo(name = "Last modified time", type = Date.class, editable = false, getValue = "getLastModifiedTime")
     @DatabaseField
