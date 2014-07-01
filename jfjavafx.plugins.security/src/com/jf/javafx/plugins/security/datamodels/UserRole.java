@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.datamodels;
+package com.jf.javafx.plugins.security.datamodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -25,32 +25,18 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Permissions")
-public class GroupPermission {
-    public static final int ACTION_CANVIEW      = 0x0007;
-    public static final int ACTION_CANEDIT      = 0x0070;
-    public static final int ACTION_CANDELETE    = 0x0700;
-    public static final int ACTION_CANEXECUTE   = 0x7000;
+@DatabaseTable(tableName = "user_roles")
+public class UserRole {
+    @DatabaseField(foreign = true, foreignColumnName = "role_name", canBeNull = false, columnName = "role_name")
+    public Role role;
     
-    @DatabaseField(id = true, generatedId = true)
-    public long id;
-    
-    @DatabaseField(foreign = true, uniqueCombo = true, canBeNull = false)
-    public Group group;
-    
-    @DatabaseField(uniqueCombo = true)
-    public long objectId;
-    
-    @DatabaseField(uniqueCombo = true)
-    public String objectClassName;
-    
-    @DatabaseField
-    public int action;
+    @DatabaseField(foreign = true, foreignColumnName = "username", canBeNull = false, columnName = "username")
+    public User user;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
     
-    @DatabaseField(canBeNull = false, foreign = true)
+    @DatabaseField(foreign = true)
     public User creator;
     
     @DatabaseField
@@ -59,5 +45,5 @@ public class GroupPermission {
     @DatabaseField(foreign = true)
     public User lastModifier;
     
-    public GroupPermission() {}
+    public UserRole() {}
 }

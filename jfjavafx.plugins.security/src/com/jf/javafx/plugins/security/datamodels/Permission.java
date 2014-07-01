@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.datamodels;
+package com.jf.javafx.plugins.security.datamodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -25,24 +25,18 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Groups")
-public class Group {
-    @DatabaseField(id = true, generatedId = true)
-    public long id;
+@DatabaseTable(tableName = "role_permissions")
+public class Permission {
+    @DatabaseField(id = true)
+    public String permission;
     
-    @DatabaseField(unique = true, canBeNull = false)
-    public String name;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "true")
-    public boolean valid;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "false")
-    public boolean deleted;
+    @DatabaseField(foreign = true, foreignColumnName = "role_name", canBeNull = false, columnName = "role_name")
+    public Role role;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
     
-    @DatabaseField(canBeNull = false, foreign = true)
+    @DatabaseField(foreign = true)
     public User creator;
     
     @DatabaseField
@@ -51,5 +45,5 @@ public class Group {
     @DatabaseField(foreign = true)
     public User lastModifier;
     
-    public Group() {}
+    public Permission() {}
 }

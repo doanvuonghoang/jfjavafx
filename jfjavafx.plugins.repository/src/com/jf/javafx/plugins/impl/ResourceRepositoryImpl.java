@@ -23,7 +23,7 @@ import com.j256.ormlite.table.TableUtils;
 import com.jf.javafx.Application;
 import com.jf.javafx.datamodels.RecordStatus;
 import com.jf.javafx.plugins.ResourceRepository;
-import com.jf.javafx.plugins.impl.datamodels.Resource;
+import com.jf.javafx.plugins.datamodels.Resource;
 import com.jf.javafx.services.Database;
 import com.jf.javafx.services.Plugins;
 import java.io.File;

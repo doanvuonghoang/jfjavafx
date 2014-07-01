@@ -13,5 +13,11 @@ import net.xeoh.plugins.base.Plugin;
  * @author Hoàng Doãn
  */
 public interface SecurityPlugin extends Plugin {
+    public void createUser(String username, String rawpassword) throws Exception;
     
+    public void createRole(String rolename) throws Exception;
+    
+    public void addRole(String username, String rolename) throws Exception;
+    
+    public void addPermission(String rolename, String permission) throws Exception;
 }

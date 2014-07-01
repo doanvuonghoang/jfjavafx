@@ -21,7 +21,7 @@ import com.jf.javafx.Controller;
 import com.jf.javafx.MsgBox;
 import com.jf.javafx.annotations.BeanUtils;
 import com.jf.javafx.plugins.menu.MenuPlugin;
-import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
+import com.jf.javafx.plugins.menu.datamodels.Menu;
 import com.jf.javafx.services.Plugins;
 import com.jf.javafx.services.Security;
 import java.beans.PropertyChangeEvent;

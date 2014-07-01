@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.datamodels;
+package com.jf.javafx.plugins.security.datamodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -25,27 +25,15 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Profiles")
-public class Profile {
-    @DatabaseField(id = true, generatedId = true)
-    public long id;
-    
-    @DatabaseField(unique = true, canBeNull = false, foreign = true)
-    public User user;
-    
-    @DatabaseField
-    public String address;
-    
-    @DatabaseField
-    public String phone;
-    
-    @DatabaseField
-    public String email;
+@DatabaseTable(tableName = "roles")
+public class Role {
+    @DatabaseField(id = true, canBeNull = false, columnName = "role_name")
+    public String roleName;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
     
-    @DatabaseField(canBeNull = false, foreign = true)
+    @DatabaseField(foreign = true)
     public User creator;
     
     @DatabaseField
@@ -54,5 +42,5 @@ public class Profile {
     @DatabaseField(foreign = true)
     public User lastModifier;
     
-    public Profile() {}
+    public Role() {}
 }

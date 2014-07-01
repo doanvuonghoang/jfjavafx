@@ -23,7 +23,7 @@ import com.jf.javafx.Application;
 import com.jf.javafx.datamodels.RecordStatus;
 import com.jf.javafx.plugins.PluginRepository;
 import com.jf.javafx.plugins.ResourceRepository;
-import com.jf.javafx.plugins.impl.datamodels.Resource;
+import com.jf.javafx.plugins.datamodels.Resource;
 import com.jf.javafx.services.Database;
 import com.jf.javafx.services.Security;
 import java.io.IOException;
@@ -53,14 +53,14 @@ import org.apache.commons.configuration.XMLConfiguration;
 @Version(version = 1000)
 public class PluginRepositoryImpl implements PluginRepository {
 
-    private Dao<com.jf.javafx.plugins.impl.datamodels.Plugin, Long> dao;
+    private Dao<com.jf.javafx.plugins.datamodels.Plugin, Long> dao;
 
     @InjectPlugin
     public ResourceRepository rr;
 
     @Init
     public void init() throws Exception {
-        dao = Application._getService(Database.class).createAppDao(com.jf.javafx.plugins.impl.datamodels.Plugin.class);
+        dao = Application._getService(Database.class).createAppDao(com.jf.javafx.plugins.datamodels.Plugin.class);
 
         if (!isInstalled(this.getClass().getName())) {
             install(this);
@@ -75,9 +75,9 @@ public class PluginRepositoryImpl implements PluginRepository {
     public boolean isInstalled(String pluginName) {
         try {
             return !dao.queryBuilder().where()
-                    .eq(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_PLUGIN_CLASS_NAME, pluginName)
-                    .and().ne(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_RECORD_STATUS, RecordStatus.DELETE)
-                    .and().eq(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_DEBUG, false).query().isEmpty();
+                    .eq(com.jf.javafx.plugins.datamodels.Plugin.FIELD_PLUGIN_CLASS_NAME, pluginName)
+                    .and().ne(com.jf.javafx.plugins.datamodels.Plugin.FIELD_RECORD_STATUS, RecordStatus.DELETE)
+                    .and().eq(com.jf.javafx.plugins.datamodels.Plugin.FIELD_DEBUG, false).query().isEmpty();
         } catch (SQLException ex) {
             Logger.getLogger(PluginRepositoryImpl.class.getName()).log(Level.INFO, null, ex);
         }
@@ -91,7 +91,7 @@ public class PluginRepositoryImpl implements PluginRepository {
 
         XMLConfiguration cfg = getPluginConfig(p);
 
-        com.jf.javafx.plugins.impl.datamodels.Plugin model = createPluginModel(p, cfg);
+        com.jf.javafx.plugins.datamodels.Plugin model = createPluginModel(p, cfg);
 
         if (model.debug) {
             executeInternalUninstall(p);
@@ -127,7 +127,7 @@ public class PluginRepositoryImpl implements PluginRepository {
     public void uninstall(String pluginClassName) throws Exception {
         Application._getService(Security.class).checkPermission("plugin:install");
 
-        dao.updateBuilder().updateColumnValue(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_RECORD_STATUS, RecordStatus.DELETE);
+        dao.updateBuilder().updateColumnValue(com.jf.javafx.plugins.datamodels.Plugin.FIELD_RECORD_STATUS, RecordStatus.DELETE);
     }
 
     public void installPlugin() throws SQLException {
@@ -135,7 +135,7 @@ public class PluginRepositoryImpl implements PluginRepository {
         TableUtils.createTable(new DataSourceConnectionSource(
                 Application._getService(Database.class).getAppDataSource(),
                 Application._getService(Database.class).getAppDBUrl()),
-                com.jf.javafx.plugins.impl.datamodels.Plugin.class);
+                com.jf.javafx.plugins.datamodels.Plugin.class);
     }
 
     public void uninstallPlugin() throws SQLException {
@@ -143,7 +143,7 @@ public class PluginRepositoryImpl implements PluginRepository {
         TableUtils.dropTable(new DataSourceConnectionSource(
                 Application._getService(Database.class).getAppDataSource(),
                 Application._getService(Database.class).getAppDBUrl()),
-                com.jf.javafx.plugins.impl.datamodels.Plugin.class, true);
+                com.jf.javafx.plugins.datamodels.Plugin.class, true);
     }
 
     private XMLConfiguration getPluginConfig(Plugin p) {
@@ -176,8 +176,8 @@ public class PluginRepositoryImpl implements PluginRepository {
         return result;
     }
 
-    private com.jf.javafx.plugins.impl.datamodels.Plugin createPluginModel(Plugin p, XMLConfiguration cfg) {
-        com.jf.javafx.plugins.impl.datamodels.Plugin model = new com.jf.javafx.plugins.impl.datamodels.Plugin();
+    private com.jf.javafx.plugins.datamodels.Plugin createPluginModel(Plugin p, XMLConfiguration cfg) {
+        com.jf.javafx.plugins.datamodels.Plugin model = new com.jf.javafx.plugins.datamodels.Plugin();
         model.pluginClassName = p.getClass().getName();
         model.author = p.getClass().getAnnotation(Author.class).name();
         model.version = p.getClass().getAnnotation(Version.class).version();
@@ -191,7 +191,7 @@ public class PluginRepositoryImpl implements PluginRepository {
         return model;
     }
 
-    private Resource createPluginResourceModel(com.jf.javafx.plugins.impl.datamodels.Plugin model, HierarchicalConfiguration c) {
+    private Resource createPluginResourceModel(com.jf.javafx.plugins.datamodels.Plugin model, HierarchicalConfiguration c) {
         Resource r = new Resource();
         r.plugin = model;
         r.sourceURI = c.getString("[@src]");
@@ -232,7 +232,7 @@ public class PluginRepositoryImpl implements PluginRepository {
     }
 
     private void removePlugin(String name) throws Exception {
-        dao.queryForEq(com.jf.javafx.plugins.impl.datamodels.Plugin.FIELD_PLUGIN_CLASS_NAME, name).forEach((m) -> {
+        dao.queryForEq(com.jf.javafx.plugins.datamodels.Plugin.FIELD_PLUGIN_CLASS_NAME, name).forEach((m) -> {
             
             try {
 //                rr.deletePluginResource(m.id);

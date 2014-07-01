@@ -15,28 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.plugins.menu;
+package com.jf.javafx;
 
-import com.jf.javafx.plugins.menu.datamodels.Menu;
-import java.util.Collection;
-import net.xeoh.plugins.base.Plugin;
+import org.apache.shiro.realm.jdbc.JdbcRealm;
 
 /**
  *
  * @author Hoàng Doãn
  */
-public interface MenuPlugin extends Plugin {
-    public void render();
+public class JFRealm extends JdbcRealm {
+
+    public JFRealm() {
+        super();
+        
+        this.setSaltStyle(SaltStyle.COLUMN);
+    }
+    // not implement yet
     
-    public Collection<Menu> getAvailableMenues() throws Exception;
-    
-    public Collection<Menu> getAllMenues() throws Exception;
-    
-    public void create(Menu menu) throws Exception;
-    
-    public void save(Collection<Menu> menues) throws Exception;
-    
-    public void save(Menu menu) throws Exception;
-    
-    public void delete(Menu menu) throws Exception;
 }

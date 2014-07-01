@@ -60,7 +60,6 @@ public class Security extends AbstractService {
         Subject currentUser = SecurityUtils.getSubject();
         if (!currentUser.isAuthenticated()) {
             currentUser.login(new UsernamePasswordToken(userName, rawPassword));
-//            app.getService(Router.class).back();
         }
     }
 
@@ -104,12 +103,13 @@ public class Security extends AbstractService {
     }
 
     private void showLogin() {
-//        app.getService(Router.class).navigate(appConfig.getString("authentication.login", "Login"));
+//        while (!SecurityUtils.getSubject().isAuthenticated()) {
         Dialogs.create()
                 .showLogin(new Dialogs.UserInfo("user", "password"), info -> {
                     login(info.getUserName(), info.getPassword());
                     return null;
                 }
                 );
+//        }
     }
 }

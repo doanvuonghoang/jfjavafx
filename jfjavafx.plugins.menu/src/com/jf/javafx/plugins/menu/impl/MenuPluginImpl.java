@@ -24,7 +24,7 @@ import com.jf.javafx.Application;
 import com.jf.javafx.MsgBox;
 import com.jf.javafx.plugins.PluginRepository;
 import com.jf.javafx.plugins.menu.MenuPlugin;
-import com.jf.javafx.plugins.menu.impl.datamodels.Menu;
+import com.jf.javafx.plugins.menu.datamodels.Menu;
 import com.jf.javafx.services.Database;
 import com.jf.javafx.services.Resource;
 import com.jf.javafx.services.Router;

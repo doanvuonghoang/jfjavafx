@@ -15,58 +15,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jf.javafx.datamodels;
+package com.jf.javafx.plugins.datamodels;
 
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.jf.javafx.datamodels.RecordStatus;
 import java.util.Date;
 
 /**
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Users")
-public class User {
-    @DatabaseField(id = true, generatedId = true)
+@DatabaseTable(tableName = "Plugins")
+public class Plugin {
+    public static final String FIELD_PLUGIN_CLASS_NAME = "pluginClassName";
+    public static final String FIELD_RECORD_STATUS = "recordStatus";
+    public static final String FIELD_DEBUG = "debug";
+    
+    @DatabaseField(generatedId = true)
     public long id;
     
-    @DatabaseField(unique = true, canBeNull = false)
-    public String userName;
-    
-    @DatabaseField(canBeNull = false)
-    public String password;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "true")
-    public boolean valid;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "false")
-    public boolean deleted;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "false")
-    public boolean mustChangePass;
+    @DatabaseField(unique = true, canBeNull = false, columnName = FIELD_PLUGIN_CLASS_NAME)
+    public String pluginClassName;
     
     @DatabaseField
-    public Date lastChangePass;
+    public String author;
+    
+    @DatabaseField
+    public int version;
+
+    @DatabaseField(width = 4000)
+    public String resourcesInString;
+    
+    @DatabaseField(defaultValue = "true", columnName = FIELD_DEBUG)
+    public boolean debug;
+    
+    @DatabaseField(defaultValue = "CREATE", columnName = FIELD_RECORD_STATUS)
+    public RecordStatus recordStatus;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
     
-    @DatabaseField(canBeNull = false, foreign = true)
-    public User creator;
+    @DatabaseField(canBeNull = false)
+    public String creator;
     
     @DatabaseField
     public Date lastModifiedTime;
     
-    @DatabaseField(foreign = true)
-    public User lastModifier;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "0")
-    public int loginFailedCount;
+    @DatabaseField
+    public String lastModifier;
     
     @ForeignCollectionField
-    public ForeignCollection<Profile> profile;
-
-    public User() {}
+    public ForeignCollection<Resource> resources;
 }

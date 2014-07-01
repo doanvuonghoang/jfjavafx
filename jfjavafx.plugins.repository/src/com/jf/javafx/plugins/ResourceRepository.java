@@ -2,7 +2,7 @@ package com.jf.javafx.plugins;
 
 
 
-import com.jf.javafx.plugins.impl.datamodels.Resource;
+import com.jf.javafx.plugins.datamodels.Resource;
 import net.xeoh.plugins.base.Plugin;
 
 /**

@@ -19,3 +19,5 @@
 /jfjavafx.plugins.genreport/build/
 /jfjavafx.plugins.auth/nbproject/private/
 /jfjavafx.plugins.security/nbproject/private/
+/jfjavafx.plugins.security/build/
+/jfjavafx.plugins.security/dist/

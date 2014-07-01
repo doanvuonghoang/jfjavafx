@@ -17,6 +17,7 @@
 
 package com.jf.javafx.plugins.security.datamodels;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
@@ -25,33 +26,21 @@ import java.util.Date;
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "Users")
+@DatabaseTable(tableName = "users")
 public class User {
-    @DatabaseField(generatedId = true)
-    public long id;
-    
-    @DatabaseField(unique = true, canBeNull = false)
-    public String userName;
+    @DatabaseField(id = true, canBeNull = false)
+    public String username;
     
     @DatabaseField(canBeNull = false)
     public String password;
     
-    @DatabaseField(canBeNull = false, defaultValue = "true")
-    public boolean valid;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "false")
-    public boolean deleted;
-    
-    @DatabaseField(canBeNull = false, defaultValue = "false")
-    public boolean mustChangePass;
-    
-    @DatabaseField
-    public Date lastChangePass;
+    @DatabaseField(columnName = "password_salt")
+    public String passwordSalt;
     
     @DatabaseField(canBeNull = false)
     public Date createdTime;
     
-    @DatabaseField(canBeNull = false, foreign = true)
+    @DatabaseField(foreign = true)
     public User creator;
     
     @DatabaseField
@@ -60,8 +49,5 @@ public class User {
     @DatabaseField(foreign = true)
     public User lastModifier;
     
-    @DatabaseField(canBeNull = false, defaultValue = "0")
-    public int loginFailedCount;
-
     public User() {}
 }
