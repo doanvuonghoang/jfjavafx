@@ -27,12 +27,14 @@ import com.jf.javafx.plugins.security.datamodels.Role;
 import com.jf.javafx.plugins.security.datamodels.User;
 import com.jf.javafx.plugins.security.datamodels.UserRole;
 import com.jf.javafx.services.Database;
+import java.util.Arrays;
 import java.util.Calendar;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import net.xeoh.plugins.base.annotations.meta.Author;
 import net.xeoh.plugins.base.annotations.meta.Version;
+import org.apache.shiro.codec.CodecSupport;
 import org.apache.shiro.crypto.RandomNumberGenerator;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha256Hash;
@@ -69,7 +71,7 @@ public class SecurityPluginImpl implements SecurityPlugin {
         User u = new User();
         u.username = username;
         u.password = hashedPasswordBase64;
-        u.passwordSalt = new String(salt.getBytes(), "UTF-8");
+        u.passwordSalt = CodecSupport.toString(salt.getBytes());
         u.createdTime = Calendar.getInstance().getTime();
 
         udao.create(u);
