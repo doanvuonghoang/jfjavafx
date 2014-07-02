@@ -19,6 +19,7 @@ package com.jf.javafx.plugins.security.datamodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -30,8 +31,11 @@ public class Role {
     @DatabaseField(id = true, canBeNull = false, columnName = "role_name")
     public String roleName;
     
+    @DatabaseField(defaultValue = "false")
+    public Boolean isSystemRole = Boolean.FALSE;
+    
     @DatabaseField(canBeNull = false)
-    public Date createdTime;
+    public Date createdTime = Calendar.getInstance().getTime();
     
     @DatabaseField(foreign = true)
     public User creator;

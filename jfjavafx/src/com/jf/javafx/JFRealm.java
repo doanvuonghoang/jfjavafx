@@ -28,7 +28,7 @@ public class JFRealm extends JdbcRealm {
     public JFRealm() {
         super();
         
-        this.setSaltStyle(SaltStyle.COLUMN);
+        this.setSaltStyle(SaltStyle.NO_SALT);
     }
     // not implement yet
     

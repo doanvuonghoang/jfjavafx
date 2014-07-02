@@ -61,6 +61,7 @@ import net.xeoh.plugins.base.annotations.meta.Version;
 public class MenuPluginImpl implements MenuPlugin {
 
     private final UI uiService = Application._getService(UI.class);
+    private final Security secService = Application._getService(Security.class);
     private final Dao<Menu, Long> dao = Application._getService(Database.class).createAppDao(Menu.class);
 
     @InjectPlugin
@@ -215,11 +216,15 @@ public class MenuPluginImpl implements MenuPlugin {
 
     @Override
     public void create(Menu menu) throws Exception {
+        secService.checkPermission("sys:menu:edit");
+        
         dao.create(menu);
     }
 
     @Override
     public void save(Collection<Menu> menues) throws Exception {
+        secService.checkPermission("sys:menu:edit");
+        
         menues.forEach((m) -> {
             try {
                 m.setLastModifier(Application._getService(Security.class).getUserName());
@@ -233,6 +238,8 @@ public class MenuPluginImpl implements MenuPlugin {
 
     @Override
     public void save(Menu menu) throws Exception {
+        secService.checkPermission("sys:menu:edit");
+        
         menu.setLastModifier(Application._getService(Security.class).getUserName());
         menu.setLastModifiedTime(Calendar.getInstance().getTime());
         dao.update(menu);
@@ -240,6 +247,8 @@ public class MenuPluginImpl implements MenuPlugin {
 
     @Override
     public void delete(Menu menu) throws Exception {
+        secService.checkPermission("sys:menu:delete");
+        
         dao.delete(menu);
     }
 

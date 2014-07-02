@@ -19,22 +19,26 @@ package com.jf.javafx.plugins.security.datamodels;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
  *
  * @author Hoàng Doãn
  */
-@DatabaseTable(tableName = "role_permissions")
+@DatabaseTable(tableName = "roles_permissions")
 public class Permission {
-    @DatabaseField(id = true)
+    @DatabaseField(generatedId = true)
+    public long id;
+    
+    @DatabaseField(canBeNull = false)
     public String permission;
     
     @DatabaseField(foreign = true, foreignColumnName = "role_name", canBeNull = false, columnName = "role_name")
     public Role role;
     
     @DatabaseField(canBeNull = false)
-    public Date createdTime;
+    public Date createdTime = Calendar.getInstance().getTime();
     
     @DatabaseField(foreign = true)
     public User creator;

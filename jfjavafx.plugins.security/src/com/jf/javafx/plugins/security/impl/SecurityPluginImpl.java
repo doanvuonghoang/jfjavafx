@@ -27,18 +27,13 @@ import com.jf.javafx.plugins.security.datamodels.Role;
 import com.jf.javafx.plugins.security.datamodels.User;
 import com.jf.javafx.plugins.security.datamodels.UserRole;
 import com.jf.javafx.services.Database;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.util.Collection;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
 import net.xeoh.plugins.base.annotations.injections.InjectPlugin;
 import net.xeoh.plugins.base.annotations.meta.Author;
 import net.xeoh.plugins.base.annotations.meta.Version;
-import org.apache.shiro.codec.CodecSupport;
-import org.apache.shiro.crypto.RandomNumberGenerator;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.crypto.hash.Sha256Hash;
-import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.authc.credential.DefaultPasswordService;
 
 /**
  *
@@ -54,8 +49,9 @@ public class SecurityPluginImpl implements SecurityPlugin {
     
     private final Dao<User, String> udao = Application._getService(Database.class).createAppDao(User.class);
     private final Dao<Role, String> rdao = Application._getService(Database.class).createAppDao(Role.class);
-    private final Dao<UserRole, String> urdao = Application._getService(Database.class).createAppDao(UserRole.class);
-    private final Dao<Permission, String> pdao = Application._getService(Database.class).createAppDao(Permission.class);
+    private final Dao<UserRole, Long> urdao = Application._getService(Database.class).createAppDao(UserRole.class);
+    private final Dao<Permission, Long> pdao = Application._getService(Database.class).createAppDao(Permission.class);
+    private final DefaultPasswordService dps = new DefaultPasswordService();
 
     @Init
     public void init() throws Exception {
@@ -64,25 +60,43 @@ public class SecurityPluginImpl implements SecurityPlugin {
 
     @Override
     public void createUser(String username, String rawpassword) throws Exception {
-        RandomNumberGenerator rng = new SecureRandomNumberGenerator();
-        ByteSource salt = rng.nextBytes();
-        
-        String hashedPasswordBase64 = new Sha256Hash(rawpassword, salt, 1024).toBase64();
+        String encryptedPassword = dps.encryptPassword(rawpassword);
         User u = new User();
         u.username = username;
-        u.password = hashedPasswordBase64;
-        u.passwordSalt = CodecSupport.toString(salt.getBytes());
-        u.createdTime = Calendar.getInstance().getTime();
+        u.password = encryptedPassword;
 
         udao.create(u);
+    }
+
+    public void createUser(User newuser) throws Exception {
+        newuser.password = dps.encryptPassword(newuser.password);
+        
+        udao.create(newuser);
+    }
+    
+    @Override
+    public Collection<User> getAllUsers() throws Exception {
+        return udao.queryForAll();
+    }
+
+    @Override
+    public void deleteUsers(User... users) throws Exception {
+        for(User u : users) {
+            if(!u.isSystemUser) {
+                udao.delete(u);
+            }
+        }
     }
 
     @Override
     public void createRole(String rolename) throws Exception {
         Role r = new Role();
         r.roleName = rolename;
-        r.createdTime = Calendar.getInstance().getTime();
         
+        rdao.create(r);
+    }
+    
+    public void createRole(Role r) throws Exception {
         rdao.create(r);
     }
 
@@ -93,9 +107,20 @@ public class SecurityPluginImpl implements SecurityPlugin {
         ur.user.username = username;
         ur.role = new Role();
         ur.role.roleName = rolename;
-        ur.createdTime = Calendar.getInstance().getTime();
         
         urdao.create(ur);
+    }
+
+    @Override
+    public void deleteRoles(Role... roles) throws Exception {
+        for(Role r : roles) {
+            rdao.delete(r);
+        }
+    }
+
+    @Override
+    public Collection<Role> getAllRoles() throws Exception {
+        return rdao.queryForAll();
     }
 
     @Override
@@ -104,7 +129,6 @@ public class SecurityPluginImpl implements SecurityPlugin {
         p.role = new Role();
         p.role.roleName = rolename;
         p.permission = permission;
-        p.createdTime = Calendar.getInstance().getTime();
         
         pdao.create(p);
     }
@@ -119,8 +143,17 @@ public class SecurityPluginImpl implements SecurityPlugin {
         TableUtils.createTable(ds, UserRole.class);
         TableUtils.createTable(ds, Permission.class);
 
-        createUser("admin", "admin");
-        createRole("Administrators");
+        User admin = new User();
+        admin.username = "admin";
+        admin.password = "admin";
+        admin.isSystemUser = Boolean.TRUE;
+        createUser(admin);
+        
+        Role adminGroup = new Role();
+        adminGroup.roleName = "Administrators";
+        adminGroup.isSystemRole = Boolean.TRUE;
+        createRole(adminGroup);
+        
         addRole("admin", "Administrators");
         addPermission("Administrators", "*");
     }
