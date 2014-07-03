@@ -114,7 +114,7 @@ public class SecurityPluginImpl implements SecurityPlugin {
     @Override
     public void deleteRoles(Role... roles) throws Exception {
         for(Role r : roles) {
-            rdao.delete(r);
+            if(!r.isSystemRole) rdao.delete(r);
         }
     }
 
