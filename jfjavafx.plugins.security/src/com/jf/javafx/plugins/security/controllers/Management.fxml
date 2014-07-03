@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="com.jf.javafx.plugins.security.controllers.Management">
+   <children>
+      <SplitPane dividerPositions="0.2602040816326531" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <items>
+            <TreeView VBox.vgrow="ALWAYS" />
+            <VBox>
+               <children>
+                  <ToolBar prefHeight="40.0" prefWidth="200.0">
+                    <items>
+                      <Button mnemonicParsing="false" text="%btnCreate.text" />
+                        <Button mnemonicParsing="false" text="%btnDelete.text" />
+                    </items>
+                  </ToolBar>
+                  <VBox spacing="10.0" VBox.vgrow="NEVER">
+                     <children>
+                        <Label fx:id="lbusername" style="-fx-font-weight: bold;" text="%username.text" VBox.vgrow="ALWAYS" />
+                        <Label fx:id="lbIsSystemUser" text="%systemUser.text" textAlignment="JUSTIFY" textOverrun="CLIP" wrapText="true" VBox.vgrow="ALWAYS" />
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <VBox.margin>
+                        <Insets bottom="50.0" />
+                     </VBox.margin>
+                  </VBox>
+                  <StackPane VBox.vgrow="ALWAYS">
+                     <children>
+                        <TabPane fx:id="userPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab fx:id="tabUser" closable="false" text="%userTab.title" />
+                            <Tab fx:id="tabRole" closable="false" text="%roleTab.title" />
+                          </tabs>
+                        </TabPane>
+                        <TabPane fx:id="rolePane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                           <tabs>
+                              <Tab fx:id="tabRole" closable="false" text="%userTab.title" />
+                              <Tab fx:id="tabPerm" closable="false" text="%permTab.title" />
+                           </tabs>
+                        </TabPane>
+                     </children>
+                  </StackPane>
+               </children>
+            </VBox>
+         </items>
+      </SplitPane>
+   </children>
+</AnchorPane>
